@@ -18,14 +18,18 @@ public class TestServiceImpl implements TestService {
         ioService.printFormattedLine("Please answer the questions below%n");
 
         for (Question question : questionDao.findAll()) {
-            ioService.printLine(question.text());
-            ioService.printLine("");
-
-            for (Answer answer : question.answers()) {
-                ioService.printLine(" - " + answer.text());         
-            }
-
-            ioService.printLine("");
+            printQuestion(question);
         }
+    }
+
+    private void printQuestion(Question question) {
+        ioService.printLine(question.text());
+        ioService.printLine("");
+
+        for (Answer answer : question.answers()) {
+            ioService.printLine(" - " + answer.text());         
+        }
+
+        ioService.printLine("");
     }
 }
