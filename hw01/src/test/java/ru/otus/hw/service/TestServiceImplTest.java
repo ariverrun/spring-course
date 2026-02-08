@@ -1,17 +1,21 @@
 package ru.otus.hw.service;
 
-import ru.otus.hw.dao.QuestionDao;
-import ru.otus.hw.domain.Answer;
-import ru.otus.hw.domain.Question;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
-import java.util.List;
-import java.util.stream.Stream;
+import ru.otus.hw.dao.QuestionDao;
+import ru.otus.hw.domain.Answer;
+import ru.otus.hw.domain.Question;
 
 public class TestServiceImplTest {
     @ParameterizedTest
@@ -29,7 +33,7 @@ public class TestServiceImplTest {
 
         for (Question question : questions) {
             verify(ioService).printLine(eq(question.text()));
-            
+
             for (Answer answer : question.answers()) {
                 verify(ioService).printLine(eq(" - " + answer.text()));
             }
@@ -38,46 +42,33 @@ public class TestServiceImplTest {
 
     private static Stream<Arguments> provideTestCases() {
         return Stream.of(
-            Arguments.of(
-                List.of(
-                    new Question(
-                        "Test 1", 
+                Arguments.of(
                         List.of(
-                            new Answer("Answer 1 to test 1", true),
-                            new Answer("Answer 2 to test 1", false),
-                            new Answer("Answer 3 to test 1", false)
-                        )
-                    ),
-                    new Question(
-                        "Test 2", 
+                                new Question(
+                                        "Test 1",
+                                        List.of(
+                                                new Answer("Answer 1 to test 1", true),
+                                                new Answer("Answer 2 to test 1", false),
+                                                new Answer("Answer 3 to test 1", false))),
+                                new Question(
+                                        "Test 2",
+                                        List.of(
+                                                new Answer("Answer 1 to test 2", false),
+                                                new Answer("Answer 2 to test 2", true),
+                                                new Answer("Answer 3 to test 2", false))))),
+                Arguments.of(
                         List.of(
-                            new Answer("Answer 1 to test 2", false),
-                            new Answer("Answer 2 to test 2", true),
-                            new Answer("Answer 3 to test 2", false)
-                        )
-                    )
-                )
-            ),
-            Arguments.of(
-                List.of(
-                    new Question(
-                        "Test 1", 
-                        List.of(
-                            new Answer("Answer 1 to test 1", true),
-                            new Answer("Answer 2 to test 1", false),
-                            new Answer("Answer 3 to test 1", false)
-                        )
-                    ),
-                    new Question(
-                        "Test 2", 
-                        List.of(
-                            new Answer("Answer 1 to test 2", false),
-                            new Answer("Answer 2 to test 2", true),
-                            new Answer("Answer 3 to test 2", false)
-                        )
-                    )
-                )
-            )                 
-        );
+                                new Question(
+                                        "Test 1",
+                                        List.of(
+                                                new Answer("Answer 1 to test 1", true),
+                                                new Answer("Answer 2 to test 1", false),
+                                                new Answer("Answer 3 to test 1", false))),
+                                new Question(
+                                        "Test 2",
+                                        List.of(
+                                                new Answer("Answer 1 to test 2", false),
+                                                new Answer("Answer 2 to test 2", true),
+                                                new Answer("Answer 3 to test 2", false))))));
     }
 }

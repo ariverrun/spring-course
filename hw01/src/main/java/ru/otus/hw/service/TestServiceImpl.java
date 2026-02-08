@@ -27,7 +27,7 @@ public class TestServiceImpl implements TestService {
         ioService.printLine("");
 
         for (Answer answer : question.answers()) {
-            ioService.printLine(" - " + answer.text());         
+            ioService.printLine(" - " + answer.text());
         }
 
         ioService.printLine("");
