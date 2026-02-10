@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,6 +19,27 @@ import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 
 public class TestServiceImplTest {
+
+    @Test
+    void shouldPrintErrorMessageWhenQuestionDaoThrowsException() {
+        IOService ioService = mock(IOService.class);
+        QuestionDao questionDao = mock(QuestionDao.class);
+
+        String errorMessage = "Some exception on trying to find all questions";
+
+        when(questionDao.findAll()).thenThrow(new RuntimeException(errorMessage));
+
+        TestService testService = new TestServiceImpl(ioService, questionDao);
+        testService.executeTest();
+
+        verify(ioService).printLine(eq(""));
+        verify(ioService).printFormattedLine(eq("Please answer the questions below%n"));
+        verify(ioService).printFormattedLine(
+            eq("Failed to get questions list: %s"),
+            eq(errorMessage)
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("provideTestCases")
     public void testExecuteTest(List<Question> questions) {
@@ -33,9 +55,15 @@ public class TestServiceImplTest {
 
         for (Question question : questions) {
             verify(ioService).printLine(eq(question.text()));
-
+            
+            int answerNumber = 1;
             for (Answer answer : question.answers()) {
-                verify(ioService).printLine(eq(" - " + answer.text()));
+                verify(ioService).printFormattedLine(
+                    eq("%d. %s"),
+                    eq(answerNumber),
+                    eq(answer.text())
+                );
+                answerNumber++;
             }
         }
     }

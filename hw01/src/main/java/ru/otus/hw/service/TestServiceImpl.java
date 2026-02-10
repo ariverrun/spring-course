@@ -14,11 +14,16 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public void executeTest() {
-        ioService.printLine("");
-        ioService.printFormattedLine("Please answer the questions below%n");
+        try {
+            ioService.printLine("");
+            ioService.printFormattedLine("Please answer the questions below%n");
 
-        for (Question question : questionDao.findAll()) {
-            printQuestion(question);
+            for (Question question : questionDao.findAll()) {
+                printQuestion(question);
+            }            
+        } catch (Exception e) {
+            System.out.println(e);
+            ioService.printFormattedLine("Failed to get questions list: %s", e.getMessage());
         }
     }
 
@@ -26,8 +31,10 @@ public class TestServiceImpl implements TestService {
         ioService.printLine(question.text());
         ioService.printLine("");
 
+        int answerNumber = 1;
         for (Answer answer : question.answers()) {
-            ioService.printLine(" - " + answer.text());
+            ioService.printFormattedLine("%d. %s", answerNumber, answer.text());
+            answerNumber++;
         }
 
         ioService.printLine("");
