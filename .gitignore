@@ -1,0 +1,6 @@
+.vscode
+*.class
+*.mvn
+
+target/
+dependency-reduced-pom.xml
