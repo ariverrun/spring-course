@@ -43,9 +43,13 @@ public class TestServiceImpl implements TestService {
 
         ioService.printLine("");
 
-        int choiceNumber = ioService.readIntForRangeWithPrompt(1, question.answers().size(), "Enter your choice", "Invalid choice");
+        int choiceNumber = ioService.readIntForRangeWithPrompt(1, answerNumber, "Enter your choice", "Invalid choice");
 
-        answerNumber = 1;
+        return isAnswerCorrectForQuestion(choiceNumber, question);
+    }
+
+    private Boolean isAnswerCorrectForQuestion(int choiceNumber, Question question) {
+        int answerNumber = 1;
         for (Answer answer : question.answers()) {
             if (choiceNumber == answerNumber) {
                 if (answer.isCorrect()) {
@@ -56,7 +60,7 @@ public class TestServiceImpl implements TestService {
             }
             answerNumber++;
         }
-
+        
         return false;
-    } 
+    }
 }
