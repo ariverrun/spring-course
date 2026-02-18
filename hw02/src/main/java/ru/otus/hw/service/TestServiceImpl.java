@@ -49,18 +49,12 @@ public class TestServiceImpl implements TestService {
     }
 
     private Boolean isAnswerCorrectForQuestion(int choiceNumber, Question question) {
-        int answerNumber = 1;
-        for (Answer answer : question.answers()) {
-            if (choiceNumber == answerNumber) {
-                if (answer.isCorrect()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            answerNumber++;
+        var answer = question.answers().get(choiceNumber - 1);
+
+        if (answer.isCorrect()) {
+            return true;
         }
-        
+
         return false;
     }
 }

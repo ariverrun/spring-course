@@ -5,14 +5,14 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-@Service
+@Component
 public class CsvQuestionReaderImpl implements CsvQuestionReader {
 
     @Override
