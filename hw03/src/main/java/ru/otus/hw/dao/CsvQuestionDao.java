@@ -1,0 +1,29 @@
+package ru.otus.hw.dao;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import ru.otus.hw.config.TestFileNameProvider;
+import ru.otus.hw.dao.dto.QuestionDto;
+import ru.otus.hw.dao.reader.CsvQuestionReader;
+import ru.otus.hw.domain.Question;
+
+@RequiredArgsConstructor
+@Component
+public class CsvQuestionDao implements QuestionDao {
+    private final TestFileNameProvider fileNameProvider;
+
+    private final CsvQuestionReader csvQuestionReader;
+
+    @Override
+    public List<Question> findAll() {
+        return csvQuestionReader
+                .readFromResourceFile(fileNameProvider.getTestFileName())
+                .stream()
+                .map(QuestionDto::toDomainObject)
+                .collect(Collectors.toList());
+    }
+}
