@@ -14,10 +14,17 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final ResultService resultService;
 
+    private final LocalizedIOService ioService;
+
     @Override
     public void run() {
-        var student = studentService.determineCurrentStudent();
-        var testResult = testService.executeTestFor(student);
-        resultService.showResult(testResult);
+        try {
+            var student = studentService.determineCurrentStudent();
+            var testResult = testService.executeTestFor(student);
+            resultService.showResult(testResult);            
+        } catch (Exception e) {
+            ioService.printFormattedLineLocalized("TestRunnerService.exception",
+                e.getLocalizedMessage());
+        }
     }
 }
