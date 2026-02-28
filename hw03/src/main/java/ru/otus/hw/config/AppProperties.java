@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Setter
-@ConfigurationProperties(prefix="test")
+@ConfigurationProperties(prefix = "test")
 public class AppProperties implements TestConfig, TestFileNameProvider, LocaleConfig {
 
     @Getter

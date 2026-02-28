@@ -13,6 +13,10 @@ import ru.otus.hw.domain.TestResult;
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
 
+    private static final String ENTER_CHOICE_PROMPT = "TestService.enter.choice";
+
+    private static final String INVALID_CHOICE_PROMPT = "TestService.invalid.choice";
+
     private final LocalizedIOService ioService;
 
     private final QuestionDao questionDao;
@@ -45,7 +49,12 @@ public class TestServiceImpl implements TestService {
 
         ioService.printLine("");
 
-        int choiceNumber = ioService.readIntForRangeWithPromptLocalized(1, answerNumber, "TestService.enter.choice", "TestService.invalid.choice");
+        int choiceNumber = ioService.readIntForRangeWithPromptLocalized(
+            1, 
+            answerNumber, 
+            ENTER_CHOICE_PROMPT, 
+            INVALID_CHOICE_PROMPT
+        );
 
         return isAnswerCorrectForQuestion(choiceNumber, question);
     }
