@@ -3,7 +3,7 @@ package ru.otus.hw.dao;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.config.TestFileNameProvider;
@@ -12,7 +12,7 @@ import ru.otus.hw.dao.reader.CsvQuestionReader;
 import ru.otus.hw.domain.Question;
 
 @RequiredArgsConstructor
-@Component
+@Repository
 public class CsvQuestionDao implements QuestionDao {
     private final TestFileNameProvider fileNameProvider;
 

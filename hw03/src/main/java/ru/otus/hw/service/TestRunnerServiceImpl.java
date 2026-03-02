@@ -1,12 +1,13 @@
 package ru.otus.hw.service;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TestRunnerServiceImpl implements TestRunnerService {
+public class TestRunnerServiceImpl implements TestRunnerService, CommandLineRunner {
 
     private final TestService testService;
 
@@ -15,6 +16,11 @@ public class TestRunnerServiceImpl implements TestRunnerService {
     private final ResultService resultService;
 
     private final LocalizedIOService ioService;
+
+    @Override
+    public void run(String... args) {
+        run();
+    }
 
     @Override
     public void run() {
