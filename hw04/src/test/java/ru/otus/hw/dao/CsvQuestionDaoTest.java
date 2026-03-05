@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import ru.otus.hw.config.TestFileNameProvider;
@@ -18,8 +17,7 @@ import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-@SpringBootTest
-@ContextConfiguration(classes = {CsvQuestionDao.class, CsvQuestionReaderImpl.class})
+@SpringBootTest(classes = {CsvQuestionDao.class, CsvQuestionReaderImpl.class})
 public class CsvQuestionDaoTest {
     private static final String EXISITING_FILE_NAME = "questions.csv";
 

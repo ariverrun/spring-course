@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import ru.otus.hw.dao.QuestionDao;
@@ -26,8 +25,7 @@ import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.domain.Student;
 
-@SpringBootTest
-@ContextConfiguration(classes = {TestServiceImpl.class})
+@SpringBootTest(classes = {TestServiceImpl.class})
 public class TestServiceImplTest {
 
     @MockitoBean
