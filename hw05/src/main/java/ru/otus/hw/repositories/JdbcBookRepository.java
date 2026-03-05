@@ -20,6 +20,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -124,9 +125,20 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private Book update(Book book) {
-        //...
+        SqlParameterSource params = new MapSqlParameterSource()
+            .addValue("id", book.getId())
+            .addValue("title", book.getTitle())
+            .addValue("author_id", book.getAuthor().getId());
+        
+        int updatedCount = jdbc.update(
+            "UPDATE books SET title = :title, author_id = :author_id WHERE id = :id",
+            params
+        );
+        
+        if (updatedCount == 0) {
+            throw new EntityNotFoundException("Book with id %d not found".formatted(book.getId()));
+        }
 
-        // Выбросить EntityNotFoundException если не обновлено ни одной записи в БД
         removeGenresRelationsFor(book);
         batchInsertGenresRelationsFor(book);
 
@@ -147,7 +159,8 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private void removeGenresRelationsFor(Book book) {
-        //...
+        Map<String, Object> params = Collections.singletonMap("book_id", book.getId());
+        jdbc.update("DELETE FROM books_genres WHERE book_id = :book_id", params);
     }
 
     private static class BookRowMapper implements RowMapper<Book> {
