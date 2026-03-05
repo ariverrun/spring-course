@@ -36,7 +36,7 @@ public class JdbcBookRepository implements BookRepository {
     @Override
     public Optional<Book> findById(long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
-        List<Book> books = jdbc.query(
+        var book = jdbc.query(
             """        
             SELECT b.id, b.title, b.author_id, a.full_name 
             FROM books b 
@@ -45,12 +45,14 @@ public class JdbcBookRepository implements BookRepository {
             WHERE b.id = :id        
             """, 
             params, 
-            new BookRowMapper()
+            new BookResultSetExtractor()
         );
-        var genres = genreRepository.findAll();
-        var relations = getAllGenreRelations();
-        mergeBooksInfo(books, genres, relations);        
-        return books.stream().findFirst();
+        if (book != null) {
+            var genres = genreRepository.findAll();
+            var relations = getAllGenreRelations();
+            mergeBooksInfo(book, genres, relations);
+        }
+        return Optional.ofNullable(book);
     }
 
     @Override
@@ -101,6 +103,18 @@ public class JdbcBookRepository implements BookRepository {
             if (bookMap.containsKey(relation.bookId()) && genreMap.containsKey(relation.genreId())) {
                 Book book = bookMap.get(relation.bookId());
                 book.addGenre(genreMap.get(relation.genreId()));
+            }
+        }
+    }
+
+    private void mergeBooksInfo(Book bookWithoutGenres, List<Genre> genres,
+                                List<BookGenreRelation> relations) {
+        Map<Long, Genre> genreMap = genres.stream()
+            .collect(Collectors.toMap(Genre::getId, Function.identity()));
+            
+        for (BookGenreRelation relation : relations) {
+            if (genreMap.containsKey(relation.genreId())) {
+                bookWithoutGenres.addGenre(genreMap.get(relation.genreId()));
             }
         }
     }
@@ -186,6 +200,17 @@ public class JdbcBookRepository implements BookRepository {
 
         @Override
         public Book extractData(ResultSet rs) throws SQLException, DataAccessException {
+            if (rs.next()) {
+                return new Book(
+                    rs.getLong("id"),
+                    rs.getString("title"),
+                    new Author(
+                        rs.getLong("author_id"),
+                        rs.getString("full_name")
+                    ),
+                    new ArrayList<>()
+                );
+            }
             return null;
         }
     }
