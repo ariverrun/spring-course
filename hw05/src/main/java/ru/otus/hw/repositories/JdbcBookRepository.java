@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
@@ -103,9 +105,17 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private Book insert(Book book) {
+        SqlParameterSource params = new MapSqlParameterSource()
+            .addValue("title", book.getTitle())
+            .addValue("author_id", book.getAuthor().getId());
         var keyHolder = new GeneratedKeyHolder();
 
-        //...
+        jdbc.update(
+            "INSERT INTO books (title, author_id) values (:title, :author_id)", 
+            params, 
+            keyHolder, 
+            new String[] {"id"}
+        );
 
         //noinspection DataFlowIssue
         book.setId(keyHolder.getKeyAs(Long.class));
@@ -124,7 +134,16 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private void batchInsertGenresRelationsFor(Book book) {
-        // Использовать метод batchUpdate
+        SqlParameterSource[] batchArgs = book.getGenres().stream()
+            .map(genre -> new MapSqlParameterSource()
+                .addValue("book_id", book.getId())
+                .addValue("genre_id", genre.getId()))
+            .toArray(SqlParameterSource[]::new);
+        
+        jdbc.batchUpdate(
+            "INSERT INTO books_genres (book_id, genre_id) VALUES (:book_id, :genre_id)",
+            batchArgs
+        );
     }
 
     private void removeGenresRelationsFor(Book book) {

@@ -2,8 +2,9 @@ package ru.otus.hw.repositories;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -26,7 +27,14 @@ public class JdbcGenreRepository implements GenreRepository {
 
     @Override
     public List<Genre> findAllByIds(Set<Long> ids) {
-        return new ArrayList<>();
+        Map<String, Object> params = Collections.singletonMap("ids", ids);
+        List<Genre> genres = jdbc.query(
+            "SELECT id, name FROM genres WHERE id IN (:ids)", 
+            params, 
+            new GenreRowMapper()
+        );        
+
+        return genres;
     }
 
     private static class GenreRowMapper implements RowMapper<Genre> {
