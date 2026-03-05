@@ -32,7 +32,22 @@ public class JdbcBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        return Optional.empty();
+        Map<String, Object> params = Collections.singletonMap("id", id);
+        List<Book> books = jdbc.query(
+            """        
+            SELECT b.id, b.title, b.author_id, a.full_name 
+            FROM books b 
+            LEFT JOIN authors a 
+            ON b.author_id = a.id 
+            WHERE b.id = :id        
+            """, 
+            params, 
+            new BookRowMapper()
+        );
+        var genres = genreRepository.findAll();
+        var relations = getAllGenreRelations();
+        mergeBooksInfo(books, genres, relations);        
+        return books.stream().findFirst();
     }
 
     @Override
