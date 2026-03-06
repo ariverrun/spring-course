@@ -113,7 +113,7 @@ public class JdbcBookRepository implements BookRepository {
             .collect(Collectors.toMap(Genre::getId, Function.identity()));
             
         for (BookGenreRelation relation : relations) {
-            if (genreMap.containsKey(relation.genreId())) {
+            if (relation.bookId() == bookWithoutGenres.getId() && genreMap.containsKey(relation.genreId())) {
                 bookWithoutGenres.addGenre(genreMap.get(relation.genreId()));
             }
         }
