@@ -56,7 +56,6 @@ public class JdbcAuthorRepository implements AuthorRepository {
         );    
     }
 
-
     private Author insert(Author author) {
         SqlParameterSource params = new MapSqlParameterSource()
             .addValue("full_name", author.getFullName());
