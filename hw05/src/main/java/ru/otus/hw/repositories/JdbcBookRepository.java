@@ -48,8 +48,12 @@ public class JdbcBookRepository implements BookRepository {
             new BookResultSetExtractor()
         );
         if (book != null) {
-            var genres = genreRepository.findAll();
-            var relations = getAllGenreRelations();
+            var relations = getBookGenreRelations(book);
+            var genres = genreRepository.findAllByIds(
+                relations.stream()
+                    .map(BookGenreRelation::genreId)
+                    .collect(Collectors.toSet())
+            );
             mergeBooksInfo(book, genres, relations);
         }
         return Optional.ofNullable(book);
@@ -89,6 +93,14 @@ public class JdbcBookRepository implements BookRepository {
 
     private List<BookGenreRelation> getAllGenreRelations() {
         return jdbc.query("SELECT book_id, genre_id FROM books_genres", new BookGenreRelationRowMapper());
+    }
+
+    private List<BookGenreRelation> getBookGenreRelations(Book book) {
+        return jdbc.query(
+            "SELECT book_id, genre_id FROM books_genres WHERE book_id = :book_id",
+            Collections.singletonMap("book_id", book.getId()),
+            new BookGenreRelationRowMapper()
+        );
     }
 
     private void mergeBooksInfo(List<Book> booksWithoutGenres, List<Genre> genres,
@@ -193,7 +205,6 @@ public class JdbcBookRepository implements BookRepository {
         }
     }
 
-    // Использовать для findById
     @SuppressWarnings("ClassCanBeRecord")
     @RequiredArgsConstructor
     private static class BookResultSetExtractor implements ResultSetExtractor<Book> {
