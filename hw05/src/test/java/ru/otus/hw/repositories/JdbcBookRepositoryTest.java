@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -21,6 +23,8 @@ import ru.otus.hw.models.Genre;
 @DisplayName("Репозиторий на основе Jdbc для работы с книгами ")
 @JdbcTest
 @Import({JdbcBookRepository.class, JdbcGenreRepository.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Sql(scripts = {"classpath:fixtures/test-data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class JdbcBookRepositoryTest {
 
     @Autowired
