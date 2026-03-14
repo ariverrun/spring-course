@@ -28,4 +28,17 @@ public class CommentRepositoryJpa implements CommentRepository {
         return entityManager.createQuery("SELECT c FROM Comment c", Comment.class)
                 .getResultList();
     }
+
+    @Override
+    public List<Comment> findByBookId(Long bookId) {
+        if (bookId == null) {
+            return List.of();
+        }
+        
+        return entityManager.createQuery(
+            "SELECT c FROM Comment c WHERE c.bookId = :bookId", 
+            Comment.class)
+            .setParameter("bookId", bookId)
+            .getResultList();
+    }
 }

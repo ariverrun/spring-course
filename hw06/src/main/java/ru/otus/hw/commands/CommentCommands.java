@@ -30,4 +30,11 @@ public class CommentCommands {
                 .collect(Collectors.joining("," + System.lineSeparator()));
     }
 
+    @ShellMethod(value = "Find comments by book id", key = "cbbid")
+    public String findByBookIdComments(Long bookId) {
+        return commentService.findBookId(bookId).stream()
+                .map(commentConverter::commentToString)
+                .collect(Collectors.joining("," + System.lineSeparator()));
+    }
+
 }

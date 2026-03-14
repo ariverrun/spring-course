@@ -35,6 +35,11 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findAll();
     }
 
+    @Override
+    public List<Comment> findBookId(Long bookId) {
+        return commentRepository.findByBookId(bookId);
+    }
+
     private Comment save(long id, String text, Long bookId) {
         if (!bookRepository.existsById(bookId)) {
             throw new EntityNotFoundException("Book with id %d not found".formatted(bookId));

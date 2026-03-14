@@ -11,4 +11,6 @@ public interface CommentService {
     Comment update(long id, String text, Long bookId);
 
     List<Comment> findAll();
+
+    List<Comment> findBookId(Long bookId);
 }
