@@ -16,13 +16,11 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
 
     @Override
-    @Transactional
     public List<Author> findAll() {
         return authorRepository.findAll();
     }
 
     @Override
-    @Transactional
     public Optional<Author> findById(long id) {
         return authorRepository.findById(id);
     }

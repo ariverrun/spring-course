@@ -16,13 +16,11 @@ public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepository;
 
     @Override
-    @Transactional
     public List<Genre> findAll() {
         return genreRepository.findAll();
     }
 
     @Override
-    @Transactional
     public Optional<Genre> findById(long id) {
         return genreRepository.findById(id);
     } 
