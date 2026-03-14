@@ -50,6 +50,15 @@ public class BookRepositoryJpa implements BookRepository {
         }
     }
 
+    @Override
+    public boolean existsById(long id) {
+        if (findById(id).isPresent()) {
+            return true;
+        }
+
+        return false;
+    }
+
     private void initBooksLazyProperities(List<Book> books) {
         books.forEach(book -> book.getGenres().size());
     }
