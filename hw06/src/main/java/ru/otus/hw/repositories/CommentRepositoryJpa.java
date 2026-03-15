@@ -1,6 +1,7 @@
 package ru.otus.hw.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -24,12 +25,6 @@ public class CommentRepositoryJpa implements CommentRepository {
     }
 
     @Override
-    public List<Comment> findAll() {
-        return entityManager.createQuery("SELECT c FROM Comment c", Comment.class)
-                .getResultList();
-    }
-
-    @Override
     public List<Comment> findByBookId(Long bookId) {
         if (bookId == null) {
             return List.of();
@@ -41,4 +36,17 @@ public class CommentRepositoryJpa implements CommentRepository {
             .setParameter("bookId", bookId)
             .getResultList();
     }
+
+    @Override
+    public Optional<Comment> findById(long id) {
+        return Optional.ofNullable(entityManager.find(Comment.class, id));
+    }
+
+    @Override
+    public void deleteById(long id) {
+        var comment = findById(id);
+        if (comment.isPresent()) {
+            entityManager.remove(comment.get());
+        }
+    }    
 }

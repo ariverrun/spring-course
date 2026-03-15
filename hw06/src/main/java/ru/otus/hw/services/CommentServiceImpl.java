@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -31,13 +32,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> findAll() {
-        return commentRepository.findAll();
+    public List<Comment> findByBookId(Long bookId) {
+        return commentRepository.findByBookId(bookId);
     }
 
     @Override
-    public List<Comment> findBookId(Long bookId) {
-        return commentRepository.findByBookId(bookId);
+    public Optional<Comment> findById(long id) {
+        return commentRepository.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(long id) {
+        commentRepository.deleteById(id);
     }
 
     private Comment save(long id, String text, Long bookId) {
