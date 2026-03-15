@@ -74,7 +74,7 @@ public class AuthorRepositoryJpaTest {
     void shouldUpdateAuthor() {
         var author = em.find(Author.class, THIRD_AUTHOR_ID);
 
-        var newFullName = "Author_3.3";
+        var newFullName = "Author_3.2";
 
         author.setFullName(newFullName);
 
