@@ -89,7 +89,6 @@ public class CommentRepositoryJpaTest {
     @Test
     void shouldDeleteComment() {
         repositoryJpa.deleteById(FOURTH_COMMENT_ID);
-
         assertThat(em.find(Comment.class, FOURTH_COMMENT_ID)).isNull();
     }  
 

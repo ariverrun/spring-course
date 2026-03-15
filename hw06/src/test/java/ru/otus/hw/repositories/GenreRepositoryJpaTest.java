@@ -93,7 +93,6 @@ public class GenreRepositoryJpaTest {
     @Test
     void shouldDeleteGenre() {
         repositoryJpa.deleteById(SIXTH_GENRE_ID);
-
         assertThat(em.find(Genre.class, SIXTH_GENRE_ID)).isNull();
     }    
 }

@@ -75,4 +75,8 @@ public class Book {
     public void addGenre(Genre genre) {
         genres.add(genre);
     }
+
+    public void removeGenres() {
+        genres = new ArrayList<>();
+    }
 }

@@ -88,7 +88,6 @@ public class AuthorRepositoryJpaTest {
     @Test
     void shouldDeleteAuthor() {
         repositoryJpa.deleteById(THIRD_AUTHOR_ID);
-
         assertThat(em.find(Author.class, THIRD_AUTHOR_ID)).isNull();
     }
 }
