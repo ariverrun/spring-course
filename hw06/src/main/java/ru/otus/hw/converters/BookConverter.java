@@ -1,10 +1,11 @@
 package ru.otus.hw.converters;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import ru.otus.hw.models.Book;
-
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
+import ru.otus.hw.models.Book;
 
 @RequiredArgsConstructor
 @Component
