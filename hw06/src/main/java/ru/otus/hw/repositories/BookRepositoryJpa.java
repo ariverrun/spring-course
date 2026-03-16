@@ -31,7 +31,7 @@ public class BookRepositoryJpa implements BookRepository {
     public List<Book> findAll() {
         EntityGraph<?> entityGraph = entityManager.getEntityGraph("book-author-entity-graph");
         TypedQuery<Book> query = entityManager.createQuery("SELECT b FROM Book b", Book.class);
-        query.setHint("javax.persistence.fetchgraph", entityGraph);
+        query.setHint("jakarta.persistence.fetchgraph", entityGraph);
         var books = query.getResultList();
         initBooksLazyProperities(books);
         return books;

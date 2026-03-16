@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Comment;
 
 @DataJpaTest
-@Import(CommentRepositoryJpa.class)
+@Import({CommentRepositoryJpa.class, BookRepositoryJpa.class})
 public class CommentRepositoryJpaTest {
  
     private static final long FIRST_COMMENT_ID = 1L;

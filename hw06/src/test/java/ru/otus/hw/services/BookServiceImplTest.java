@@ -23,30 +23,30 @@ public class BookServiceImplTest {
     private BookServiceImpl bookService;
 
     @Test
-    void shouldFindAllBooksAndAllowAccessToLazyFieldsWithoutTransaction() {
+    void shouldFindAllBooksAndAllowAccessToLazyPropertiesWithoutTransaction() {
         List<Book> books = bookService.findAll();
         assertThat(TransactionSynchronizationManager.isActualTransactionActive())
             .isFalse();
         assertThat(books).isNotEmpty();
 
         for (Book book : books) {
-            assertDoesNotThrow(() -> {
-                book.getAuthor();
-                book.getGenres();
-            });
+            assertBookLazyPropertiesAreAccessible(book);
         }
     }
 
     @Test
-    void shouldFindBookByIdAndAllowAccessToLazyFieldsWithoutTransaction() {
+    void shouldFindBookByIdAndAllowAccessToLazyPropertiesWithoutTransaction() {
         var optionalBook = bookService.findById(FIRST_BOOK_ID);
         assertThat(TransactionSynchronizationManager.isActualTransactionActive())
             .isFalse();
         assertThat(optionalBook).isPresent();
-        var book = optionalBook.get();
+        assertBookLazyPropertiesAreAccessible(optionalBook.get());
+    }
+
+    private void assertBookLazyPropertiesAreAccessible(Book book) {
         assertDoesNotThrow(() -> {
-            book.getAuthor();
-            book.getGenres();
+            book.getAuthor().getFullName();
+            book.getGenres().size();
         });
     }    
 }
