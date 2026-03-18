@@ -13,7 +13,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import ru.otus.hw.models.Book;
 
-@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
+@SpringBootTest
 @Import(BookServiceImpl.class)
 public class BookServiceImplTest {
 

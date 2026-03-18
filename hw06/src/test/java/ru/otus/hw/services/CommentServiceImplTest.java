@@ -13,7 +13,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import ru.otus.hw.models.Comment;
 
-@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
+@SpringBootTest
 @Import(CommentServiceImpl.class)
 public class CommentServiceImplTest {
 

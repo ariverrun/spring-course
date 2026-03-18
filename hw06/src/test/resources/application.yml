@@ -5,3 +5,6 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+  shell:
+    interactive:
+      enabled: false
