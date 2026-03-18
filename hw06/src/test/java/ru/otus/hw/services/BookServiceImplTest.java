@@ -7,14 +7,20 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import ru.otus.hw.models.Book;
+import ru.otus.hw.repositories.AuthorRepositoryJpa;
+import ru.otus.hw.repositories.BookRepositoryJpa;
+import ru.otus.hw.repositories.GenreRepositoryJpa;
 
-@SpringBootTest
-@Import(BookServiceImpl.class)
+@DataJpaTest
+@Transactional(propagation = Propagation.NEVER)
+@Import({AuthorRepositoryJpa.class, BookRepositoryJpa.class, GenreRepositoryJpa.class, BookServiceImpl.class})
 public class BookServiceImplTest {
 
     private static final long FIRST_BOOK_ID = 1L;

@@ -7,14 +7,19 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import ru.otus.hw.models.Comment;
+import ru.otus.hw.repositories.BookRepositoryJpa;
+import ru.otus.hw.repositories.CommentRepositoryJpa;
 
-@SpringBootTest
-@Import(CommentServiceImpl.class)
+@DataJpaTest
+@Transactional(propagation = Propagation.NEVER)
+@Import({CommentServiceImpl.class, BookRepositoryJpa.class, CommentRepositoryJpa.class})
 public class CommentServiceImplTest {
 
     private static final long FIRST_BOOK_ID = 1L;
