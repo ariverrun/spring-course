@@ -128,10 +128,4 @@ public class BookRepositoryJpaTest {
         repositoryJpa.deleteById(THIRD_BOOK_ID);
         assertThat(em.find(Book.class, THIRD_BOOK_ID)).isNull();
     }
-
-    @Test
-    void shouldCheckIfBookExists() {
-        assertThat(repositoryJpa.existsById(SECOND_BOOK_ID)).isTrue();
-        assertThat(repositoryJpa.existsById(FIFTH_BOOK_ID)).isFalse();
-    }       
 }

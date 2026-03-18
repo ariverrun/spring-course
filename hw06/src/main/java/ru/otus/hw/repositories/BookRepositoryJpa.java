@@ -48,13 +48,4 @@ public class BookRepositoryJpa implements BookRepository {
             entityManager.remove(book.get());
         }
     }
-
-    @Override
-    public boolean existsById(long id) {
-        if (findById(id).isPresent()) {
-            return true;
-        }
-
-        return false;
-    }
 }

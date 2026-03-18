@@ -13,6 +13,4 @@ public interface BookRepository {
     Book save(Book book);
 
     void deleteById(long id);
-
-    boolean existsById(long id);
 }
