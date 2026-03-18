@@ -34,13 +34,20 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public List<Comment> findByBookId(Long bookId) {
-        return commentRepository.findByBookId(bookId);
+        var comments = commentRepository.findByBookId(bookId);
+        initCommentsLazyProperities(comments);
+        return comments;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Comment> findById(long id) {
-        return commentRepository.findById(id);
+        var optionalComment = commentRepository.findById(id);
+        if (optionalComment.isPresent()) {
+            bookRepository.findById(optionalComment.get().getBook().getId());
+            initCommentLazyProperities(optionalComment.get());
+        }
+        return optionalComment;
     }
 
     @Override
@@ -63,4 +70,13 @@ public class CommentServiceImpl implements CommentService {
 
         return commentRepository.save(comment);
     }
+    
+    private void initCommentsLazyProperities(List<Comment> comments) {
+        comments.forEach(comment -> comment.getBook());
+    }
+
+    private void initCommentLazyProperities(Comment comment) {
+        comment.getBook().getAuthor().getFullName();
+        comment.getBook().getGenres().size();
+    }    
 }

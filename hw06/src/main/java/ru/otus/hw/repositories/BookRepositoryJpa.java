@@ -33,7 +33,6 @@ public class BookRepositoryJpa implements BookRepository {
         TypedQuery<Book> query = entityManager.createQuery("SELECT b FROM Book b", Book.class);
         query.setHint("jakarta.persistence.fetchgraph", entityGraph);
         var books = query.getResultList();
-        initBooksLazyProperities(books);
         return books;
     }
 
@@ -57,9 +56,5 @@ public class BookRepositoryJpa implements BookRepository {
         }
 
         return false;
-    }
-
-    private void initBooksLazyProperities(List<Book> books) {
-        books.forEach(book -> book.getGenres().size());
     }
 }

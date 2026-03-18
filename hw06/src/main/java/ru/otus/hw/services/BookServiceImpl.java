@@ -34,7 +34,9 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public List<Book> findAll() {
-        return bookRepository.findAll();
+        var books = bookRepository.findAll();
+        initBooksLazyProperities(books);
+        return books;
     }
 
     @Override
@@ -70,4 +72,8 @@ public class BookServiceImpl implements BookService {
         var book = new Book(id, title, author, genres);
         return bookRepository.save(book);
     }
+
+    private void initBooksLazyProperities(List<Book> books) {
+        books.forEach(book -> book.getGenres().size());
+    }    
 }

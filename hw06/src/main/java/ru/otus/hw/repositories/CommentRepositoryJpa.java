@@ -46,19 +46,12 @@ public class CommentRepositoryJpa implements CommentRepository {
             .setParameter("book", optionalBook.get())
             .getResultList();
 
-        initCommentsLazyProperities(comments);
-
         return comments;
     }
 
     @Override
     public Optional<Comment> findById(long id) {
-        var optionalComment = Optional.ofNullable(entityManager.find(Comment.class, id));
-        if (optionalComment.isPresent()) {
-            bookRepository.findById(optionalComment.get().getBook().getId());
-            initCommentLazyProperities(optionalComment.get());
-        }
-        return optionalComment;
+        return Optional.ofNullable(entityManager.find(Comment.class, id));
     }
 
     @Override
@@ -67,14 +60,5 @@ public class CommentRepositoryJpa implements CommentRepository {
         if (comment.isPresent()) {
             entityManager.remove(comment.get());
         }
-    }
-    
-    private void initCommentsLazyProperities(List<Comment> comments) {
-        comments.forEach(comment -> comment.getBook());
-    }
-
-    private void initCommentLazyProperities(Comment comment) {
-        comment.getBook().getAuthor().getFullName();
-        comment.getBook().getGenres().size();
     }
 }
