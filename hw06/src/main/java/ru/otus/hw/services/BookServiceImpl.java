@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
@@ -42,13 +44,19 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public Book insert(String title, long authorId, Set<Long> genresIds) {
-        return save(0, title, authorId, genresIds);
+        var book = new Book(0, title, getAuthorById(authorId), getNotEmptyGenresListByIds(genresIds));
+        return bookRepository.save(book);
     }
 
     @Override
     @Transactional
     public Book update(long id, String title, long authorId, Set<Long> genresIds) {
-        return save(id, title, authorId, genresIds);
+        var book = bookRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
+        book.setTitle(title);
+        book.setAuthor(getAuthorById(authorId));
+        book.setGenres(getNotEmptyGenresListByIds(genresIds));
+        return bookRepository.save(book);
     }
 
     @Override
@@ -57,20 +65,20 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-    private Book save(long id, String title, long authorId, Set<Long> genresIds) {
+    private Author getAuthorById(long authorId) {
+        return authorRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
+    }
+
+    private List<Genre> getNotEmptyGenresListByIds(Set<Long> genresIds) {
         if (isEmpty(genresIds)) {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
-
-        var author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
         var genres = genreRepository.findAllByIds(genresIds);
         if (isEmpty(genres) || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
-
-        var book = new Book(id, title, author, genres);
-        return bookRepository.save(book);
+        return genres;        
     }
 
     private void initBooksLazyProperities(List<Book> books) {

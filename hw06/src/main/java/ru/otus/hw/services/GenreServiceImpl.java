@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.GenreRepository;
 
@@ -28,13 +29,17 @@ public class GenreServiceImpl implements GenreService {
     @Override
     @Transactional
     public Genre insert(String name) {
-        return save(0, name);
+        var genre = new Genre(0, name);
+        return genreRepository.save(genre);
     }
 
     @Override
     @Transactional
     public Genre update(long id, String name) {
-        return save(id, name);
+        var genre = genreRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));
+        genre.setName(name);
+        return genreRepository.save(genre);
     }    
 
     @Override
@@ -42,9 +47,4 @@ public class GenreServiceImpl implements GenreService {
     public void deleteById(long id) {
         genreRepository.deleteById(id);
     }
-
-    private Genre save(long id, String name) {
-        var genre = new Genre(id, name);
-        return genreRepository.save(genre);
-    }    
 }

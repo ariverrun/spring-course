@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
 
@@ -28,23 +29,22 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     public Author insert(String fullName) {
-        return save(0, fullName);
+        var author = new Author(0, fullName);
+        return authorRepository.save(author);
     }
 
     @Override
     @Transactional
     public Author update(long id, String fullName) {
-        return save(id, fullName);
+        var author = authorRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
+        author.setFullName(fullName);
+        return authorRepository.save(author);
     }
 
     @Override
     @Transactional
     public void deleteById(long id) {
         authorRepository.deleteById(id);
-    }
-
-    private Author save(long id, String fullName) {
-        var book = new Author(id, fullName);
-        return authorRepository.save(book);
     }
 }
