@@ -53,6 +53,8 @@ public class BookServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("getBooksForInsert")
+    @Transactional
+    @Rollback
     void shouldInsertNewBook(Book expectedBook) {
         var savedBook = bookService.insert(
             expectedBook.getTitle(), 
