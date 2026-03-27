@@ -59,8 +59,6 @@ public class BookRepositoryTest {
         var savedBook = repository.save(newBook);
         assertThat(savedBook.getId()).isEqualTo(nextBookId);
         savedBook = em.find(Book.class, nextBookId);
-        // assertThat(savedBook)
-        //     .isEqualTo(newBook);
         assertThat(savedBook.getAuthor().getId())
             .isEqualTo(author.getId());    
         assertThat(savedBook.getGenres()).isNotEmpty()
