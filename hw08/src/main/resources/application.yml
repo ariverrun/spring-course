@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://myuser2:mypassword2@localhost:27018/admin?authSource=admin
+      uri: mongodb://usr:pwd@localhost:27017/hw08?authSource=admin
 
 mongock:
   enabled: true

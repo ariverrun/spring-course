@@ -1,13 +1,3 @@
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
-
-ifneq (,$(wildcard ./.env.local))
-    include .env.local
-    export
-endif
-
 up:
 	docker compose up -d
 
@@ -18,4 +8,4 @@ ps:
 	docker compose ps -a
 
 mongosh:
-	docker compose exec mongo mongosh -u $(MONGO_USER) -p $(MONGO_PASSWORD) --authenticationDatabase $(MONGO_DATABASE)
+	docker compose exec mongo mongosh -u usr -p pwd --authenticationDatabase hw08

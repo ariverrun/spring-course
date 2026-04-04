@@ -3,10 +3,10 @@ services:
     image: mongo:6.0
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin}
+      MONGO_INITDB_ROOT_USERNAME: usr
+      MONGO_INITDB_ROOT_PASSWORD: pwd
     ports:
-      - "${MONGO_PORT:-27017}:27017"
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
