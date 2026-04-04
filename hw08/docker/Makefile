@@ -16,3 +16,6 @@ down:
 
 ps:
 	docker compose ps -a
+
+mongosh:
+	docker compose exec mongo mongosh -u $(MONGO_USER) -p $(MONGO_PASSWORD) --authenticationDatabase $(MONGO_DATABASE)

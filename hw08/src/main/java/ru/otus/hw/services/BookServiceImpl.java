@@ -5,6 +5,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
@@ -73,10 +75,14 @@ public class BookServiceImpl implements BookService {
         if (isEmpty(genresIds)) {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
-        var genres = genreRepository.findAllById(genresIds);
+        
+        Iterable<Genre> genresIterable = genreRepository.findAllById(genresIds);
+        List<Genre> genres = StreamSupport.stream(genresIterable.spliterator(), false)
+                                        .collect(Collectors.toList());
+        
         if (isEmpty(genres) || genresIds.size() != genres.size()) {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
-        return genres;        
+        return genres;
     }
 }
