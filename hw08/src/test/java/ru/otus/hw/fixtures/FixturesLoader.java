@@ -1,28 +1,23 @@
-package ru.otus.hw.migrations;
+package ru.otus.hw.fixtures;
 
 import java.util.ArrayList;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import io.mongock.api.annotations.ChangeUnit;
-import io.mongock.api.annotations.Execution;
-import io.mongock.api.annotations.RollbackExecution;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 
-@ChangeUnit(id = "init_collections", order = "001")
-public class InitCollectionsChange {
+public class FixturesLoader {
     
     private final MongoTemplate mongoTemplate;
     
-    public InitCollectionsChange(MongoTemplate mongoTemplate) {
+    public FixturesLoader(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
     
-    @Execution
-    public void execute() {
+    public void load() {
         createCollectionsIfNotExist();
         insertAuthors();
         insertGenres();
@@ -110,8 +105,7 @@ public class InitCollectionsChange {
         mongoTemplate.insert(comment4, "comments");
     }
     
-    @RollbackExecution
-    public void rollback() {
+    public void purge() {
         dropCollectionIfExists("comments");
         dropCollectionIfExists("books");
         dropCollectionIfExists("genres");
