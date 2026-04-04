@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -21,14 +20,12 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     
     @Override
-    @Transactional
     public Comment insert(String text, String bookId) {
         var comment = new Comment(null, getBookById(bookId), text);
         return commentRepository.save(comment);
     }
 
     @Override
-    @Transactional
     public Comment update(String id, String text, String bookId) {
         var comment = commentRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
@@ -38,20 +35,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Comment> findByBookId(String bookId) {
         var comments = commentRepository.findByBookId(bookId);
         return comments;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<Comment> findById(String id) {
         return commentRepository.findById(id);
     }
 
     @Override
-    @Transactional
     public void deleteById(String id) {
         commentRepository.deleteById(id);
     }
