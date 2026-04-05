@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title></title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1 th:text="'Жанр ' + ${genre.id}"></h1>
+
+        <div>
+            <p>
+                Название:
+                <span th:text="${genre.name}"></span>
+            </p>
+        </div>
+    </section>
+</body>
+</html>

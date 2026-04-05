@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Добавить жанр</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Добавить жанр</h1>
+
+        <form th:action="@{/genres}" method="post">
+            <div>
+                <label for="name">Название</label>
+                <input type="text" name="name"/>
+            </div>
+            <button type="submit" class="btn btn-danger">Сохранить</button>
+        </form>
+
+    </section>
+</body>
+</html>
