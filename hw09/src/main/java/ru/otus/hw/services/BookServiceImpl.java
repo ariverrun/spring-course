@@ -65,6 +65,11 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
+    @Override
+    public Book getById(long id) {
+        return findById(id).orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
+    }
+
     private Author getAuthorById(long authorId) {
         return authorRepository.findById(authorId)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
@@ -83,5 +88,5 @@ public class BookServiceImpl implements BookService {
 
     private void initBooksLazyProperities(List<Book> books) {
         books.forEach(book -> book.getGenres().size());
-    }    
+    }
 }

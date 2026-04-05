@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Добавить книгу</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Добавить книгу</h1>
+
+        <form th:action="@{/books}" method="post">
+            <div>
+                <label for="title">Название</label>
+                <input type="text" name="title"/>
+            </div>
+            <div>
+                <label for="author">Автор</label>
+                <select name="authorId">
+                    <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.fullName}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="genreIds">Жанры</label>
+                <select name="genreIds" multiple="true">
+                    <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"></option>
+                </select>
+            </div>            
+            <button type="submit" class="btn btn-danger">Сохранить</button>
+        </form>
+
+    </section>
+</body>
+</html>

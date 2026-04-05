@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Удалить книгу</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Удалить книгу</h1>
+        
+        <div>
+            <p>
+                Вы действительно хотите удалить книгу
+                <span th:text="${book.title}"></span>
+                ?
+            </p>
+        </div>
+
+        <form th:action="@{/books/{id}(id=${book.id})}" method="post" th:method="delete">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <!-- <a th:href="@{/genres}" class="btn btn-secondary">Отмена</a> -->
+        </form>
+
+    </section>
+</body>
+</html>

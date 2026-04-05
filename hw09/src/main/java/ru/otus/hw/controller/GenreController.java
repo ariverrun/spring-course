@@ -31,15 +31,13 @@ public class GenreController {
 
     @GetMapping("/genres/{genreId}")
     public String showGenre(@PathVariable Long genreId, Model model) {
-        var genre = genreService.getById(genreId);
-        model.addAttribute("genre", genre);
+        populateModelWithGenre(genreId, model);
         return "genres/show";
     }
 
     @GetMapping("/genres/{genreId}/delete")
     public String showDeletePage(@PathVariable Long genreId, Model model) {
-        var genre = genreService.getById(genreId);
-        model.addAttribute("genre", genre);
+        populateModelWithGenre(genreId, model);
         return "genres/delete";
     }
 
@@ -62,8 +60,7 @@ public class GenreController {
 
     @GetMapping("/genres/{genreId}/edit")
     public String showEditPage(@PathVariable Long genreId, Model model) {
-        var genre = genreService.getById(genreId);
-        model.addAttribute("genre", genre);        
+        populateModelWithGenre(genreId, model);     
         return "genres/edit";
     }
 
@@ -71,5 +68,10 @@ public class GenreController {
     public String updateGenre(@PathVariable Long genreId, UpdateGenreRequestDto requestDto) {
         genreService.update(genreId, requestDto.name());
         return "redirect:/genres"; 
-    }    
+    }
+
+    private void populateModelWithGenre(Long genreId, Model model) {
+        var genre = genreService.getById(genreId);
+        model.addAttribute("genre", genre);            
+    }
 }

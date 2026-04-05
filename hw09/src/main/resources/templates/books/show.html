@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title></title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1 th:text="'Книга ' + ${book.id}"></h1>
+
+        <div>
+            <p>
+                Название:
+                <span th:text="${book.title}"></span>
+            </p>
+            <p>
+                Автор:
+                <span th:text="${book.author.fullName}"></span>
+            </p>
+            <p>
+                Жанры:
+                <ul th:each="genre : ${book.genres}">
+                    <li th:text="${genre.name}"></li>
+                </ul>
+            </p>
+        </div>
+    </section>
+</body>
+</html>
