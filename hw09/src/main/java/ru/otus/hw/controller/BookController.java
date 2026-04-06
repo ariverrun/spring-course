@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.requests.CreateBookRequestDto;
 import ru.otus.hw.requests.UpdateBookRequestDto;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
+import ru.otus.hw.services.CommentService;
 import ru.otus.hw.services.GenreService;
 
 @Controller
@@ -24,6 +26,8 @@ public class BookController {
     private final AuthorService authorService;
 
     private final GenreService genreService;
+
+    private final CommentService commentService;
     
     @GetMapping({"/books", "/"})
     public String listAllBooks(Model model) {
@@ -35,6 +39,7 @@ public class BookController {
     @GetMapping("/books/{bookId}")
     public String showBook(@PathVariable Long bookId, Model model) {
         populateModelWithBook(bookId, model);
+        populateModelWithBookComments(bookId, model);
         return "books/show";
     }
     
@@ -57,7 +62,7 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public String createBook(CreateBookRequestDto requestDto) {
+    public String createBook(@Valid CreateBookRequestDto requestDto) {
         bookService.insert(requestDto.title(), requestDto.authorId(), requestDto.genreIds());
         return "redirect:/books"; 
     }    
@@ -70,7 +75,7 @@ public class BookController {
     }
 
     @PutMapping("/books/{bookId}")
-    public String updateBook(@PathVariable Long bookId, UpdateBookRequestDto requestDto) {
+    public String updateBook(@PathVariable Long bookId, @Valid UpdateBookRequestDto requestDto) {
         bookService.update(bookId, requestDto.title(), requestDto.authorId(), requestDto.genreIds());
         return "redirect:/books"; 
     }
@@ -85,5 +90,10 @@ public class BookController {
         model.addAttribute("authors", authors);
         var genres = genreService.findAll();
         model.addAttribute("genres", genres);
+    }
+
+    private void populateModelWithBookComments(Long bookId, Model model) {
+        var comments = commentService.findByBookId(bookId);
+        model.addAttribute("comments", comments);
     }
 }

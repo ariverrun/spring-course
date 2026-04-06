@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.requests.CreateAuthorRequestDto;
 import ru.otus.hw.requests.UpdateAuthorRequestDto;
@@ -50,7 +51,7 @@ public class AuthorController {
     }
     
     @PostMapping("/authors")
-    public String createAuthor(CreateAuthorRequestDto requestDto) {
+    public String createAuthor(@Valid CreateAuthorRequestDto requestDto) {
         authorService.insert(requestDto.fullName());
         return "redirect:/authors"; 
     }
@@ -62,7 +63,7 @@ public class AuthorController {
     }
 
     @PutMapping("/authors/{authorId}")
-    public String updateAuthor(@PathVariable Long authorId, UpdateAuthorRequestDto requestDto) {
+    public String updateAuthor(@PathVariable Long authorId, @Valid UpdateAuthorRequestDto requestDto) {
         authorService.update(authorId, requestDto.fullName());
         return "redirect:/authors"; 
     }

@@ -3,9 +3,9 @@ package ru.otus.hw.requests;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UpdateGenreRequestDto(
+public record UpdateCommentRequestDto(
     @NotBlank
-    @Size(min = 2, max = 20)
-    String name
+    @Size(min = 2, max = 1024)
+    String text
 ) {    
 }

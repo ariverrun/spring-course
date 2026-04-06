@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.requests.CreateGenreRequestDto;
 import ru.otus.hw.requests.UpdateGenreRequestDto;
@@ -50,7 +51,7 @@ public class GenreController {
     }
     
     @PostMapping("/genres")
-    public String createGenre(CreateGenreRequestDto requestDto) {
+    public String createGenre(@Valid CreateGenreRequestDto requestDto) {
         genreService.insert(requestDto.name());
         return "redirect:/genres"; 
     }
@@ -62,7 +63,7 @@ public class GenreController {
     }
 
     @PutMapping("/genres/{genreId}")
-    public String updateGenre(@PathVariable Long genreId, UpdateGenreRequestDto requestDto) {
+    public String updateGenre(@PathVariable Long genreId, @Valid UpdateGenreRequestDto requestDto) {
         genreService.update(genreId, requestDto.name());
         return "redirect:/genres"; 
     }

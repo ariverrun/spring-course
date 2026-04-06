@@ -16,4 +16,6 @@ public interface CommentService {
     Optional<Comment> findById(long id);
 
     void deleteById(long id);
+
+    Comment getById(long id);
 }

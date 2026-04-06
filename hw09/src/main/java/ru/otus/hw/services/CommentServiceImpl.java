@@ -56,6 +56,11 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(id);
     }
 
+    @Override
+    public Comment getById(long id) {
+        return findById(id).orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));
+    }
+
     private Book getBookById(Long bookId) {
         return bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(bookId)));
