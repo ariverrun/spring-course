@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Редактировать автора</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Редактировать автора</h1>
+
+        <form th:action="@{/authors/{id}(id=${author.id})}" method="post" th:method="put">
+            <div>
+                <label for="fullName">Имя</label>
+                <input type="text" name="fullName" th:value="${author.fullName}" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-danger">Сохранить</button>
+        </form>
+
+    </section>
+</body>
+</html>

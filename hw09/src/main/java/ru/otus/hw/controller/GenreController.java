@@ -1,7 +1,5 @@
 package ru.otus.hw.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.models.Genre;
 import ru.otus.hw.requests.CreateGenreRequestDto;
 import ru.otus.hw.requests.UpdateGenreRequestDto;
 import ru.otus.hw.services.GenreService;
@@ -24,7 +21,7 @@ public class GenreController {
     
     @GetMapping("/genres")
     public String listAllGenres(Model model) {
-        List<Genre> genres = genreService.findAll();
+        var genres = genreService.findAll();
         model.addAttribute("genres", genres);
         return "genres/all";
     }

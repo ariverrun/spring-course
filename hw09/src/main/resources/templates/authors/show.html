@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title></title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1 th:text="'Автор ' + ${author.id}"></h1>
+
+        <div>
+            <p>
+                Имя:
+                <span th:text="${author.fullName}"></span>
+            </p>
+        </div>
+    </section>
+</body>
+</html>

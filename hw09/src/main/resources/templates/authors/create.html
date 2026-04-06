@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Добавить автора</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Добавить автора</h1>
+
+        <form th:action="@{/authors}" method="post">
+            <div>
+                <label for="fullName">Имя</label>
+                <input type="text" name="fullName"/>
+            </div>
+            <button type="submit" class="btn btn-danger">Сохранить</button>
+        </form>
+
+    </section>
+</body>
+</html>

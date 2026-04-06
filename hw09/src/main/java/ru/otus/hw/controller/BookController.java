@@ -1,7 +1,5 @@
 package ru.otus.hw.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.requests.CreateBookRequestDto;
 import ru.otus.hw.requests.UpdateBookRequestDto;
 import ru.otus.hw.services.AuthorService;
@@ -30,7 +27,7 @@ public class BookController {
     
     @GetMapping({"/books", "/"})
     public String listAllBooks(Model model) {
-        List<Book> books = bookService.findAll();
+        var books = bookService.findAll();
         model.addAttribute("books", books);
         return "books/all";
     }
