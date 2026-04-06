@@ -4,6 +4,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,12 +13,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -121,6 +125,89 @@ class BookControllerTest {
             .andExpect(model().attribute("genres", expectedGenres));            
         
         verify(authorService).findAll();
+        verify(genreService).findAll();
+    }
+
+    @ParameterizedTest
+    @MethodSource("getBooksForInsert")
+    @SuppressWarnings("null")
+    void shouldCreateBook(Book expectedBook) throws Exception {
+        when(bookService.insert(
+            expectedBook.getTitle(),
+            expectedBook.getAuthor().getId(),
+            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+        )).thenReturn(expectedBook);
+
+        mockMvc.perform(post("/books")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("title", expectedBook.getTitle())
+            .param("authorId", Long.valueOf(expectedBook.getAuthor().getId()).toString())
+            .param("genreIds", expectedBook.getGenres().stream()
+                .map(g -> String.valueOf(g.getId()))
+                .toArray(String[]::new)))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/books"));
+    
+        verify(bookService).insert(
+            expectedBook.getTitle(),
+            expectedBook.getAuthor().getId(),
+            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getDbBooks")
+    void shouldShowEditPage(Book expectedBook) throws Exception {
+        when(bookService.getById(expectedBook.getId())).thenReturn(expectedBook);
+
+        var expectedAuthors = getDbAuthors();
+        when(authorService.findAll()).thenReturn(expectedAuthors);
+
+        var expectedGenres = getDbGenres();
+        when(genreService.findAll()).thenReturn(expectedGenres);
+
+        mockMvc.perform(get("/books/{bookId}/edit", expectedBook.getId()))
+            .andExpect(status().isOk())
+            .andExpect(view().name("books/edit"))
+            .andExpect(model().attributeExists("book"))
+            .andExpect(model().attribute("book", expectedBook))            
+            .andExpect(model().attributeExists("authors"))
+            .andExpect(model().attribute("authors", expectedAuthors))
+            .andExpect(model().attributeExists("genres"))
+            .andExpect(model().attribute("genres", expectedGenres));            
+        
+        verify(bookService).getById(expectedBook.getId());
+        verify(authorService).findAll();
+        verify(genreService).findAll();
+    }
+
+    @ParameterizedTest
+    @MethodSource("getBooksForUpdate")
+    @SuppressWarnings("null")
+    void shouldUpdateBook(Book expectedBook) throws Exception {
+        when(bookService.update(
+            expectedBook.getId(),
+            expectedBook.getTitle(),
+            expectedBook.getAuthor().getId(),
+            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+        )).thenReturn(expectedBook);
+
+        mockMvc.perform(put("/books/{bookId}", expectedBook.getId())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("title", expectedBook.getTitle())
+            .param("authorId", Long.valueOf(expectedBook.getAuthor().getId()).toString())
+            .param("genreIds", expectedBook.getGenres().stream()
+                .map(g -> String.valueOf(g.getId()))
+                .toArray(String[]::new)))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/books"));
+    
+        verify(bookService).update(
+            expectedBook.getId(),
+            expectedBook.getTitle(),
+            expectedBook.getAuthor().getId(),
+            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+        );
     }
 
     private static List<Book> getDbBooks() {
@@ -183,5 +270,41 @@ class BookControllerTest {
             new Genre(5L, "Genre_5"),
             new Genre(6L, "Genre_6")
         );
+    }
+
+    private static List<Book> getBooksForInsert() {
+        Author author1 = new Author(1L, "Author_1");
+        Author author2 = new Author(2L, "Author_2");
+
+        Genre genre1 = new Genre(1L, "Genre_1");
+        Genre genre2 = new Genre(2L, "Genre_2");
+
+        Book book4 = new Book(4L, "BookTitle_4", author1, new ArrayList<>());
+        book4.addGenre(genre1);
+        book4.addGenre(genre2);
+        
+        Book book5 = new Book(5L, "BookTitle_5", author2, new ArrayList<>());
+        book5.addGenre(genre1);
+
+        return List.of(book4, book5);
+    }
+    
+    private static List<Book> getBooksForUpdate() {
+        Author author2 = new Author(2L, "Author_2");
+        Author author3 = new Author(3L, "Author_3");
+        
+        Genre genre1 = new Genre(1L, "Genre_1");
+        Genre genre3 = new Genre(3L, "Genre_3");
+        Genre genre4 = new Genre(4L, "Genre_4");
+        
+        Book book1 = new Book(1L, "BookTitle_1.1", author2, new ArrayList<>());
+        book1.addGenre(genre3);
+        book1.addGenre(genre4);
+        
+        Book book2 = new Book(2L, "BookTitle_2.1", author3, new ArrayList<>());
+        book2.addGenre(genre1);
+        book2.addGenre(genre4);
+        
+        return List.of(book1, book2);
     }    
 }
