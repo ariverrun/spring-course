@@ -18,7 +18,6 @@ import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
-import ru.otus.hw.repositories.CommentRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
 @RequiredArgsConstructor
@@ -29,8 +28,6 @@ public class BookServiceImpl implements BookService {
     private final GenreRepository genreRepository;
 
     private final BookRepository bookRepository;
-
-    private final CommentRepository commentRepository;
 
     @Override
     public Optional<Book> findById(String id) {
@@ -60,9 +57,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteById(String id) {
-        var book = bookRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Book with id %s is not found".formatted(id)));
-        commentRepository.deleteByBook(book);
         bookRepository.deleteById(id);
     }
 

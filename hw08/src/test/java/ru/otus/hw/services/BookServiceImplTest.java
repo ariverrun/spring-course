@@ -96,7 +96,6 @@ public class BookServiceImplTest {
         assertThat(commentRepository.findByBookId(bookId)).isNotEmpty();
         bookService.deleteById(bookId);
         assertThat(bookService.findById(bookId)).isNotPresent();
-        assertThat(commentRepository.findByBookId(bookId)).isEmpty();
     }
 
     private static List<Book> getDbBooks() {

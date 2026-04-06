@@ -10,14 +10,11 @@ import lombok.RequiredArgsConstructor;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
-import ru.otus.hw.repositories.BookRepository;
 
 @RequiredArgsConstructor
 @Service
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
-
-    private final BookRepository bookRepository;
 
     @Override
     public List<Author> findAll() {
@@ -45,9 +42,6 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void deleteById(String id) {
-        var author = authorRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Author with id %s not found".formatted(id)));
-        bookRepository.deleteByAuthor(author);
         authorRepository.deleteById(id);
     }
 }

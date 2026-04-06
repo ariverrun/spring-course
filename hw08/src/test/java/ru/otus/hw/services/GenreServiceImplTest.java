@@ -15,10 +15,9 @@ import org.springframework.context.annotation.Import;
 
 import ru.otus.hw.fixtures.FixturesLoader;
 import ru.otus.hw.models.Genre;
-import ru.otus.hw.repositories.BooksRepositoryCustomImpl;
 
 @DataMongoTest
-@Import({GenreServiceImpl.class, BooksRepositoryCustomImpl.class, FixturesLoader.class})
+@Import({GenreServiceImpl.class, FixturesLoader.class})
 public class GenreServiceImplTest {
     
     @Autowired

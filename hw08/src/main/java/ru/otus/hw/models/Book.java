@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -22,21 +21,11 @@ public class Book {
 
     private String title;
 
-    @DBRef
     private Author author;
 
-    @DBRef
     private List<Genre> genres = new ArrayList<>();
 
     public void addGenre(Genre genre) {
         genres.add(genre);
-    }
-
-    public void removeGenres() {
-        genres = new ArrayList<>();
-    }
-
-    public void removeGenreById(String genreId) {
-        genres.removeIf(genre -> genre != null && genre.getId().equals(genreId));
     }
 }
