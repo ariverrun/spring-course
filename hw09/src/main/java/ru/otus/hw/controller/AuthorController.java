@@ -52,7 +52,7 @@ public class AuthorController {
     
     @PostMapping("/authors")
     public String createAuthor(@Valid CreateAuthorRequestDto requestDto) {
-        authorService.insert(requestDto.fullName());
+        authorService.insert(requestDto);
         return "redirect:/authors"; 
     }
 
@@ -64,7 +64,7 @@ public class AuthorController {
 
     @PutMapping("/authors/{authorId}")
     public String updateAuthor(@PathVariable Long authorId, @Valid UpdateAuthorRequestDto requestDto) {
-        authorService.update(authorId, requestDto.fullName());
+        authorService.update(authorId, requestDto);
         return "redirect:/authors"; 
     }
 

@@ -52,7 +52,7 @@ public class GenreController {
     
     @PostMapping("/genres")
     public String createGenre(@Valid CreateGenreRequestDto requestDto) {
-        genreService.insert(requestDto.name());
+        genreService.insert(requestDto);
         return "redirect:/genres"; 
     }
 
@@ -64,7 +64,7 @@ public class GenreController {
 
     @PutMapping("/genres/{genreId}")
     public String updateGenre(@PathVariable Long genreId, @Valid UpdateGenreRequestDto requestDto) {
-        genreService.update(genreId, requestDto.name());
+        genreService.update(genreId, requestDto);
         return "redirect:/genres"; 
     }
 

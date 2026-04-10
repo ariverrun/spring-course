@@ -63,7 +63,7 @@ public class BookController {
 
     @PostMapping("/books")
     public String createBook(@Valid CreateBookRequestDto requestDto) {
-        bookService.insert(requestDto.title(), requestDto.authorId(), requestDto.genreIds());
+        bookService.insert(requestDto);
         return "redirect:/books"; 
     }    
 
@@ -76,7 +76,7 @@ public class BookController {
 
     @PutMapping("/books/{bookId}")
     public String updateBook(@PathVariable Long bookId, @Valid UpdateBookRequestDto requestDto) {
-        bookService.update(bookId, requestDto.title(), requestDto.authorId(), requestDto.genreIds());
+        bookService.update(bookId, requestDto);
         return "redirect:/books"; 
     }
 

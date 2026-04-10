@@ -24,6 +24,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import ru.otus.hw.dto.CreateBookRequestDto;
+import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
@@ -132,11 +134,12 @@ class BookControllerTest {
     @MethodSource("getBooksForInsert")
     @SuppressWarnings("null")
     void shouldCreateBook(Book expectedBook) throws Exception {
-        when(bookService.insert(
+        var expectedDto = new CreateBookRequestDto(
             expectedBook.getTitle(),
             expectedBook.getAuthor().getId(),
             expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
-        )).thenReturn(expectedBook);
+        );
+        when(bookService.insert(expectedDto)).thenReturn(expectedBook);
 
         mockMvc.perform(post("/books")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -148,11 +151,7 @@ class BookControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/books"));
     
-        verify(bookService).insert(
-            expectedBook.getTitle(),
-            expectedBook.getAuthor().getId(),
-            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
-        );
+        verify(bookService).insert(expectedDto);
     }
 
     @ParameterizedTest
@@ -185,11 +184,14 @@ class BookControllerTest {
     @MethodSource("getBooksForUpdate")
     @SuppressWarnings("null")
     void shouldUpdateBook(Book expectedBook) throws Exception {
+        var expectedDto = new UpdateBookRequestDto(
+            expectedBook.getTitle(), 
+            expectedBook.getAuthor().getId(), 
+            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+        );
         when(bookService.update(
             expectedBook.getId(),
-            expectedBook.getTitle(),
-            expectedBook.getAuthor().getId(),
-            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+            expectedDto
         )).thenReturn(expectedBook);
 
         mockMvc.perform(put("/books/{bookId}", expectedBook.getId())
@@ -204,9 +206,7 @@ class BookControllerTest {
     
         verify(bookService).update(
             expectedBook.getId(),
-            expectedBook.getTitle(),
-            expectedBook.getAuthor().getId(),
-            expectedBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())
+            expectedDto
         );
     }
 
