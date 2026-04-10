@@ -1,11 +1,11 @@
-package ru.otus.hw.requests;
+package ru.otus.hw.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UpdateAuthorRequestDto(
+public record UpdateGenreRequestDto(
     @NotBlank
     @Size(min = 2, max = 20)
-    String fullName
+    String name
 ) {    
 }

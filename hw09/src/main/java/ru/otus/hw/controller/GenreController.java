@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.requests.CreateGenreRequestDto;
-import ru.otus.hw.requests.UpdateGenreRequestDto;
+import ru.otus.hw.dto.CreateGenreRequestDto;
+import ru.otus.hw.dto.UpdateGenreRequestDto;
 import ru.otus.hw.services.GenreService;
 
 @Controller

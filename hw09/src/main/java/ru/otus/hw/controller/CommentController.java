@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.requests.CreateCommentRequestDto;
-import ru.otus.hw.requests.UpdateCommentRequestDto;
+import ru.otus.hw.dto.CreateCommentRequestDto;
+import ru.otus.hw.dto.UpdateCommentRequestDto;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.CommentService;
 

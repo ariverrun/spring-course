@@ -1,4 +1,4 @@
-package ru.otus.hw.requests;
+package ru.otus.hw.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
