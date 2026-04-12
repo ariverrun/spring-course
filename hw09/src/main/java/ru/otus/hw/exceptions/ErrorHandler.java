@@ -15,28 +15,17 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 public class ErrorHandler {
  
-    @ExceptionHandler({EntityNotFoundException.class})
+    @ExceptionHandler({EntityNotFoundException.class, NoHandlerFoundException.class, NoResourceFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ModelAndView handleEntityNotFound(Exception ex) {
-        log.error("Entity not found error", ex);
+    public ModelAndView handleNotFound(Exception ex) {
         ModelAndView mav = new ModelAndView("error/404");
         mav.addObject("errorMessage", "Объект не найден");
         return mav;
     }
 
-    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ModelAndView handleAddressNotFound(Exception ex) {
-        log.error("Handler or resource not found error", ex);
-        ModelAndView mav = new ModelAndView("error/404");
-        mav.addObject("errorMessage", "Адрес не существует");
-        return mav;
-    }
-
     @ExceptionHandler({MethodArgumentNotValidException.class})
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ModelAndView handleInvalidArguments(MethodArgumentNotValidException ex) {
-        log.error("Invalid arguments error", ex);
         ModelAndView mav = new ModelAndView("error/400");
         mav.addObject("errorMessage", "Невалидные данные");
         return mav;
