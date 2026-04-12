@@ -29,6 +29,7 @@ import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
+import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
@@ -214,6 +215,32 @@ class BookControllerTest {
             expectedBook.getId(),
             expectedDto
         );
+    }
+
+    @Test
+    void shouldGet404() throws Exception {
+        long bookId = 100L;
+        when(bookService.findById(bookId)).thenThrow(EntityNotFoundException.class);
+        mockMvc.perform(get("/books/{id}", bookId))
+            .andExpect(status().isNotFound())
+        ;
+        verify(bookService).findById(bookId);      
+    }
+
+    @Test
+    void shouldGet500() throws Exception {
+        long bookId = 1L;
+        when(bookService.findById(bookId)).thenThrow(RuntimeException.class);
+        mockMvc.perform(get("/books/{id}", bookId))
+            .andExpect(status().isInternalServerError())
+        ;
+        verify(bookService).findById(bookId);      
+    }
+
+    @Test
+    void shouldGet400() throws Exception {
+        mockMvc.perform(post("/books"))
+            .andExpect(status().isBadRequest());
     }
 
     private static List<Book> getDbBooks() {
