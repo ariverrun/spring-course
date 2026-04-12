@@ -3,14 +3,17 @@ package ru.otus.hw.services;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.dto.AuthorDto;
+import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
+import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
@@ -31,8 +34,23 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Book> findById(long id) {
-        return bookRepository.findById(id);
+    public BookDto findById(long id) {
+        var book = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
+        return new BookDto(
+            id, 
+            book.getTitle(),
+            new AuthorDto(
+                book.getAuthor().getId(), 
+                book.getAuthor().getFullName()
+            ),
+            book.getGenres().stream()
+                .map(g -> new GenreDto(
+                    g.getId(),
+                    g.getName()
+                ))
+                .collect(Collectors.toSet())
+        );
     }
 
     @Override
@@ -70,11 +88,6 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public void deleteById(long id) {
         bookRepository.deleteById(id);
-    }
-
-    @Override
-    public Book getById(long id) {
-        return findById(id).orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
     }
 
     private Author getAuthorById(long authorId) {

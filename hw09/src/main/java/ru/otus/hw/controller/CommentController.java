@@ -27,36 +27,34 @@ public class CommentController {
 
     @GetMapping("/comments/{commentId}/delete")
     public String showDeletePage(@PathVariable Long commentId, Model model) {
-        populateModelWithCommentAndBook(commentId, model);
+        populateModelWithComment(commentId, model);
         return "comments/delete";
     }
 
     @DeleteMapping("/comments/{commentId}")
     public String deleteComment(@PathVariable Long commentId) {
-        var comment = commentService.getById(commentId);
-        var book = comment.getBook();
+        var comment = commentService.findById(commentId);
         commentService.deleteById(commentId);
-        return "redirect:/books/" + book.getId();
+        return "redirect:/books/" + comment.bookId();
     }
 
     @GetMapping("/comments/{commentId}")
     public String showComment(@PathVariable Long commentId, Model model) {
-        populateModelWithCommentAndBook(commentId, model);
+        populateModelWithComment(commentId, model);
         return "comments/show";
     }
 
     @GetMapping("/comments/{commentId}/edit")
     public String showEditPage(@PathVariable Long commentId, Model model) {
-        populateModelWithCommentAndBook(commentId, model);
+        populateModelWithComment(commentId, model);
         return "comments/edit";
     }
 
     @PutMapping("/comments/{commentId}")
     public String updateComment(@PathVariable Long commentId, @Valid UpdateCommentRequestDto requestDto) {
-        var comment = commentService.getById(commentId);
-        var book = comment.getBook();
-        commentService.update(new UpdateCommentDto(commentId, requestDto.text(), book.getId()));
-        return "redirect:/books/" + book.getId();
+        var comment = commentService.findById(commentId);
+        commentService.update(new UpdateCommentDto(commentId, requestDto.text(), comment.bookId()));
+        return "redirect:/books/" + comment.bookId();
     }
 
     @GetMapping("/books/{bookId}/comments/create")
@@ -71,15 +69,13 @@ public class CommentController {
         return "redirect:/books/" + bookId;
     }
 
-    private void populateModelWithCommentAndBook(Long commentId, Model model) {
-        var comment = commentService.getById(commentId);
+    private void populateModelWithComment(Long commentId, Model model) {
+        var comment = commentService.findById(commentId);
         model.addAttribute("comment", comment);
-        var book = comment.getBook();
-        model.addAttribute("book", book);
     }
 
     private void populateModelWithBook(Long bookId, Model model) {
-        var book = bookService.getById(bookId);
+        var book = bookService.findById(bookId);
         model.addAttribute("book", book);        
     }    
 }

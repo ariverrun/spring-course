@@ -69,7 +69,7 @@ public class GenreController {
     }
 
     private void populateModelWithGenre(Long genreId, Model model) {
-        var genre = genreService.getById(genreId);
+        var genre = genreService.findById(genreId);
         model.addAttribute("genre", genre);            
     }
 }

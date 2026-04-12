@@ -28,7 +28,7 @@ public class AuthorController {
     }
 
     @GetMapping("/authors/{authorId}")
-    public String showauthor(@PathVariable Long authorId, Model model) {
+    public String showAuthor(@PathVariable Long authorId, Model model) {
         populateModelWithAuthor(authorId, model);
         return "authors/show";
     }
@@ -69,7 +69,7 @@ public class AuthorController {
     }
 
     private void populateModelWithAuthor(Long authorId, Model model) {
-        var author = authorService.getById(authorId);
+        var author = authorService.findById(authorId);
         model.addAttribute("author", author);            
     }    
 }

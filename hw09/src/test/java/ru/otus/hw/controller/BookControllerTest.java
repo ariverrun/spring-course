@@ -24,7 +24,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import ru.otus.hw.dto.AuthorDto;
+import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
+import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -70,8 +73,9 @@ class BookControllerTest {
 
     @ParameterizedTest
     @MethodSource("getDbBooks")
-    void shouldShowOneBook(Book expectedBook) throws Exception {        
-        when(bookService.getById(expectedBook.getId())).thenReturn(expectedBook);
+    void shouldShowOneBook(Book expectedBook) throws Exception {
+        var expectedBookDto = mapBookEntityToDto(expectedBook);
+        when(bookService.findById(expectedBook.getId())).thenReturn(expectedBookDto);
         var expectedComments = getDbCommentsByBookId(expectedBook.getId());
         when(commentService.findByBookId(expectedBook.getId())).thenReturn(expectedComments);
         
@@ -79,25 +83,26 @@ class BookControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("books/show"))
             .andExpect(model().attributeExists("book"))
-            .andExpect(model().attribute("book", expectedBook))
+            .andExpect(model().attribute("book", expectedBookDto))
             .andExpect(model().attributeExists("comments"))
             .andExpect(model().attribute("comments", expectedComments));
         
-        verify(bookService).getById(expectedBook.getId());
+        verify(bookService).findById(expectedBook.getId());
     }
 
     @ParameterizedTest
     @MethodSource("getDbBooks")
-    void shouldShowDeletePage(Book expectedBook) throws Exception {        
-        when(bookService.getById(expectedBook.getId())).thenReturn(expectedBook);
+    void shouldShowDeletePage(Book expectedBook) throws Exception {
+        var expectedBookDto = mapBookEntityToDto(expectedBook);
+        when(bookService.findById(expectedBook.getId())).thenReturn(expectedBookDto);
         
         mockMvc.perform(get("/books/{id}/delete", expectedBook.getId()))
             .andExpect(status().isOk())
             .andExpect(view().name("books/delete"))
             .andExpect(model().attributeExists("book"))
-            .andExpect(model().attribute("book", expectedBook));
+            .andExpect(model().attribute("book", expectedBookDto));
         
-        verify(bookService).getById(expectedBook.getId());
+        verify(bookService).findById(expectedBook.getId());
     }
 
     @ParameterizedTest
@@ -157,7 +162,8 @@ class BookControllerTest {
     @ParameterizedTest
     @MethodSource("getDbBooks")
     void shouldShowEditPage(Book expectedBook) throws Exception {
-        when(bookService.getById(expectedBook.getId())).thenReturn(expectedBook);
+        var expectedBookDto = mapBookEntityToDto(expectedBook);
+        when(bookService.findById(expectedBook.getId())).thenReturn(expectedBookDto);
 
         var expectedAuthors = getDbAuthors();
         when(authorService.findAll()).thenReturn(expectedAuthors);
@@ -169,13 +175,13 @@ class BookControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("books/edit"))
             .andExpect(model().attributeExists("book"))
-            .andExpect(model().attribute("book", expectedBook))            
+            .andExpect(model().attribute("book", expectedBookDto)) 
             .andExpect(model().attributeExists("authors"))
             .andExpect(model().attribute("authors", expectedAuthors))
             .andExpect(model().attributeExists("genres"))
             .andExpect(model().attribute("genres", expectedGenres));            
         
-        verify(bookService).getById(expectedBook.getId());
+        verify(bookService).findById(expectedBook.getId());
         verify(authorService).findAll();
         verify(genreService).findAll();
     }
@@ -306,5 +312,22 @@ class BookControllerTest {
         book2.addGenre(genre4);
         
         return List.of(book1, book2);
-    }    
+    }
+
+    private static BookDto mapBookEntityToDto(Book book) {
+        return new BookDto(
+            book.getId(),
+            book.getTitle(),
+            new AuthorDto(
+                book.getAuthor().getId(), 
+                book.getAuthor().getFullName()
+            ),
+            book.getGenres().stream()
+                .map(g -> new GenreDto(
+                    g.getId(),
+                    g.getName()
+                ))
+                .collect(Collectors.toSet())
+        );
+    }
 }

@@ -81,7 +81,7 @@ public class BookController {
     }
 
     private void populateModelWithBook(Long bookId, Model model) {
-        var book = bookService.getById(bookId);
+        var book = bookService.findById(bookId);
         model.addAttribute("book", book);        
     }
 

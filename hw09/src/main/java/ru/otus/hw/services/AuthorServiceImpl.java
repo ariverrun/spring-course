@@ -1,12 +1,12 @@
 package ru.otus.hw.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.CreateAuthorRequestDto;
 import ru.otus.hw.dto.UpdateAuthorRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -24,8 +24,10 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Optional<Author> findById(long id) {
-        return authorRepository.findById(id);
+    public AuthorDto findById(long id) {
+        var author = authorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
+        return new AuthorDto(id, author.getFullName());
     }
 
     @Override
@@ -48,10 +50,5 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     public void deleteById(long id) {
         authorRepository.deleteById(id);
-    }
-
-    @Override
-    public Author getById(long id) {
-        return findById(id).orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
     }
 }
