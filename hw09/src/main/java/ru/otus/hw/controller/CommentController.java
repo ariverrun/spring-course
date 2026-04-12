@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.CreateCommentRequestDto;
+import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.dto.UpdateCommentRequestDto;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.CommentService;
@@ -53,7 +55,7 @@ public class CommentController {
     public String updateComment(@PathVariable Long commentId, @Valid UpdateCommentRequestDto requestDto) {
         var comment = commentService.getById(commentId);
         var book = comment.getBook();
-        commentService.update(commentId, requestDto.text(), book.getId());
+        commentService.update(new UpdateCommentDto(commentId, requestDto.text(), book.getId()));
         return "redirect:/books/" + book.getId();
     }
 
@@ -65,7 +67,7 @@ public class CommentController {
     
     @PostMapping("/books/{bookId}/comments")
     public String createComment(@PathVariable Long bookId, @Valid CreateCommentRequestDto requestDto) {
-        commentService.insert(requestDto.text(), bookId);
+        commentService.insert(new CreateCommentDto(requestDto.text(), bookId));
         return "redirect:/books/" + bookId;
     }
 
