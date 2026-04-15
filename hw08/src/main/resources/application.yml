@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://usr:pwd@localhost:27017/hw08?authSource=admin
+
+mongock:
+  enabled: true
+  migration-scan-package:
+    - ru.otus.hw.migrations

@@ -6,3 +6,5 @@ target/
 dependency-reduced-pom.xml
 
 *.log
+
+*.env.local
