@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Редактировать жанр</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Редактировать жанр</h1>
+
+        <form th:action="@{/genres/{id}(id=${genre.id})}" method="post" th:method="put">
+            <div>
+                <label for="name">Название</label>
+                <input type="text" name="name" th:value="${genre.name}" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-danger">Сохранить</button>
+        </form>
+
+    </section>
+</body>
+</html>

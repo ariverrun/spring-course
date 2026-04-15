@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>400 - Ошибка</title>
+</head>
+<body>
+<section th:fragment="content">
+    <div class="container mt-5">
+        <div class="alert alert-warning">
+            <h1>400 - Ошибка</h1>
+            <p th:text="${errorMessage} ?: 'Ошибка.'">
+            </p>
+            <a href="/" class="btn btn-primary">Вернуться на главную</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

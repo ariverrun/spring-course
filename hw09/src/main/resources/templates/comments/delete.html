@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Удалить комментарий</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Удалить комментарий</h1>
+        
+        <div>
+            <p>
+                Вы действительно хотите удалить комментарий
+                "<span th:text="${comment.text}"></span>"
+                к книге <span th:text="${comment.bookTitle}"></span>
+                ?
+            </p>
+        </div>
+
+        <form th:action="@{/comments/{id}(id=${comment.id})}" method="post" th:method="delete">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <!-- <a th:href="@{/genres}" class="btn btn-secondary">Отмена</a> -->
+        </form>
+
+    </section>
+</body>
+</html>

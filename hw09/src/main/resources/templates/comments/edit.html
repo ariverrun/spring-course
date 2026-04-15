@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Редактировать комментарий</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Редактировать комментарий</h1>
+
+        <form th:action="@{/comments/{id}(id=${comment.id})}" method="post" th:method="put">
+            <div>
+                <label for="text">Текст</label>
+                <input type="text" name="text" th:value="${comment.text}" class="form-control"/>
+            </div>
+            <div>
+                <label for="text">Книга</label>
+                <input type="text" name="book" th:value="${comment.bookTitle}" class="form-control" disabled="true"/>
+            </div>            
+            <button type="submit" class="btn btn-danger">Сохранить</button>
+        </form>
+
+    </section>
+</body>
+</html>

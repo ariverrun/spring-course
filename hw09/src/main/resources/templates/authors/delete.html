@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Удалить автора</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Удалить автора</h1>
+        
+        <div>
+            <p>
+                Вы действительно хотите удалить автора
+                <span th:text="${author.fullName}"></span>
+                ?
+            </p>
+        </div>
+
+        <form th:action="@{/authors/{id}(id=${author.id})}" method="post" th:method="delete">
+            <button type="submit" class="btn btn-danger">Удалить</button>
+            <!-- <a th:href="@{/genres}" class="btn btn-secondary">Отмена</a> -->
+        </form>
+
+    </section>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>500 - Ошибка сервера</title>
+</head>
+<body>
+<section th:fragment="content">
+    <div class="container mt-5">
+        <div class="alert alert-danger">
+            <h1>500 - Внутренняя ошибка сервера</h1>
+            <p th:text="${errorMessage} ?: 'Произошла непредвиденная ошибка.'">
+            </p>
+            <a href="/" class="btn btn-primary">Вернуться на главную</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

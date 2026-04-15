@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Список жанров</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <h1>Список жанров</h1>
+        
+        <a th:href="@{/genres/create}" class="btn btn-primary mb-3">Добавить жанр</a>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="genre : ${genres}">
+                    <td th:text="${genre.id}"></td>
+                    <td th:text="${genre.name}"></td>
+                    <td>
+                        <a th:href="@{/genres/{id}(id=${genre.id})}" class="btn btn-sm btn-primary">Просмотр</a>
+                        <a th:href="@{/genres/{id}/edit(id=${genre.id})}" class="btn btn-sm btn-warning">Редактировать</a>
+                        <a th:href="@{/genres/{id}/delete(id=${genre.id})}" class="btn btn-sm btn-danger">Удалить</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>
