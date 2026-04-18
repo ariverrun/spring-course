@@ -1,33 +1,41 @@
-import { useEffect, useState } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import AuthorForm from './pages/AuthorForm';
+import AuthorList from './pages/AuthorList';
+import AuthorView from './pages/AuthorView';
+import BookForm from './pages/BookForm';
+import BookList from './pages/BookList';
+import BookView from './pages/BookView';
+import GenreForm from './pages/GenreForm';
+import GenreList from './pages/GenreList';
+import GenreView from './pages/GenreView';
 
 function App() {
-  const [message, setMessage] = useState('Loading...')
-
-  useEffect(() => {
-    fetch('/api/v1/book')
-      .then(res => res.json())
-      .then(data => {
-        setMessage(`Hello from React! Found ${data.length} books in database`)
-      })
-      .catch(err => {
-        setMessage('Hello from React! (Backend not connected)')
-      })
-  }, [])
-
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-      <h1>📚 Book Library</h1>
-      <p>{message}</p>
-      <hr />
-      <h3>API endpoints ready:</h3>
-      <ul>
-        <li>GET /api/v1/book</li>
-        <li>GET /api/v1/author</li>
-        <li>GET /api/v1/genre</li>
-        <li>GET /api/v1/comment?bookId=1</li>
-      </ul>
+    <div>
+      <NavBar />
+      <div style={{ padding: '20px' }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/books" replace />} />
+          
+          <Route path="/books" element={<BookList />} />
+          <Route path="/books/create" element={<BookForm />} />
+          <Route path="/books/:id" element={<BookView />} />
+          <Route path="/books/:id/edit" element={<BookForm />} />
+          
+          <Route path="/authors" element={<AuthorList />} />
+          <Route path="/authors/create" element={<AuthorForm />} />
+          <Route path="/authors/:id" element={<AuthorView />} />
+          <Route path="/authors/:id/edit" element={<AuthorForm />} />
+          
+          <Route path="/genres" element={<GenreList />} />
+          <Route path="/genres/create" element={<GenreForm />} />
+          <Route path="/genres/:id" element={<GenreView />} />
+          <Route path="/genres/:id/edit" element={<GenreForm />} />
+        </Routes>
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
