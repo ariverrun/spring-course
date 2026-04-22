@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
@@ -34,19 +37,20 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public BookDto findById(long id) {
-        var book = bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
-        return mapBookToDto(book);
+    public Mono<BookDto> findById(long id) {
+        return Mono.fromCallable(() -> bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(id))))
+                .map(this::mapBookToDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookDto> findAll() {
-        var books = bookRepository.findAll();
-        return books.stream()
-            .map(book -> mapBookToDto(book))
-            .toList();
+    public Flux<BookDto> findAll() {
+        return Mono.fromCallable(bookRepository::findAll)
+                .flatMapMany(Flux::fromIterable)
+                .map(this::mapBookToDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private BookDto mapBookToDto(Book book) {
@@ -68,46 +72,75 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookDto insert(CreateBookRequestDto dto) {
-        var book = new Book(
-            null, 
-            dto.title(), 
-            getAuthorById(dto.authorId()), 
-            getNotEmptyGenresListByIds(dto.genreIds())
-        );
-        return mapBookToDto(bookRepository.save(book));
+    public Mono<BookDto> insert(CreateBookRequestDto dto) {
+        return Mono.zip(
+            getAuthorById(dto.authorId()),
+            getGenresByIds(dto.genreIds())
+        )
+        .flatMap(tuple -> {
+            Author author = tuple.getT1();
+            List<Genre> genres = tuple.getT2();
+            
+            return Mono.fromCallable(() -> {
+                var book = new Book(null, dto.title(), author, genres);
+                return bookRepository.save(book);
+            });
+        })
+        .map(this::mapBookToDto)
+        .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     @Transactional
-    public BookDto update(long id, UpdateBookRequestDto dto) {
-        var book = bookRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
-        book.setTitle(dto.title());
-        book.setAuthor(getAuthorById(dto.authorId()));
-        book.setGenres(getNotEmptyGenresListByIds(dto.genreIds()));
-        return mapBookToDto(bookRepository.save(book));
-    }
+        public Mono<BookDto> update(long id, UpdateBookRequestDto dto) {
+        return Mono.zip(
+            Mono.fromCallable(() -> bookRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)))),
+            getAuthorById(dto.authorId()),
+            getGenresByIds(dto.genreIds())
+        )
+        .flatMap(tuple -> {
+            Book book = tuple.getT1();
+            Author author = tuple.getT2();
+            List<Genre> genres = tuple.getT3();
+            
+            book.setTitle(dto.title());
+            book.setAuthor(author);
+            book.setGenres(genres);
+            
+            return Mono.fromCallable(() -> bookRepository.save(book));
+        })
+        .map(this::mapBookToDto)
+        .subscribeOn(Schedulers.boundedElastic());
+}
 
     @Override
     @Transactional
-    public void deleteById(long id) {
-        bookRepository.deleteById(id);
+    public Mono<Void> deleteById(long id) {
+        return Mono.fromRunnable(() -> bookRepository.deleteById(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
-    private Author getAuthorById(long authorId) {
-        return authorRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
+    private Mono<Author> getAuthorById(long authorId) {
+        return Mono.fromCallable(() -> authorRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId))))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
-    private List<Genre> getNotEmptyGenresListByIds(Set<Long> genresIds) {
+    private Mono<List<Genre>> getGenresByIds(Set<Long> genresIds) {
         if (isEmpty(genresIds)) {
-            throw new IllegalArgumentException("Genres ids must not be null");
+            return Mono.error(new IllegalArgumentException("Genres ids must not be null"));
         }
-        var genres = genreRepository.findAllByIds(genresIds);
-        if (isEmpty(genres) || genresIds.size() != genres.size()) {
-            throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
-        }
-        return genres;        
+        
+        return Mono.fromCallable(() -> genreRepository.findAllByIds(genresIds))
+            .flatMap(genres -> {
+                if (isEmpty(genres) || genresIds.size() != genres.size()) {
+                    return Mono.error(new EntityNotFoundException(
+                        "One or all genres with ids %s not found".formatted(genresIds)));
+                }
+                return Mono.just(genres);
+            })
+            .subscribeOn(Schedulers.boundedElastic());
     }
 }

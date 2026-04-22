@@ -17,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CreateCommentDto;
+import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.dto.UpdateCommentRequestDto;
 import ru.otus.hw.services.CommentService;
@@ -45,8 +46,9 @@ public class CommentRestController {
 
     @PostMapping("/api/v1/comment")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<CommentDto> createComment(@RequestBody @Valid CreateCommentDto requestDto) {
-        return commentService.insert(requestDto);
+    public Mono<CreatedEntityDto> createComment(@RequestBody @Valid CreateCommentDto requestDto) {
+        return commentService.insert(requestDto)
+            .map(c -> new CreatedEntityDto(c.id()));
     }    
 
     @PutMapping("/api/v1/comment/{commentId}")
