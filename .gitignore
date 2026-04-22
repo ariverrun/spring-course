@@ -8,3 +8,7 @@ dependency-reduced-pom.xml
 *.log
 
 *.env.local
+
+node/
+node_modules/
+package-lock.json
