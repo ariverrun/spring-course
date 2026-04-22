@@ -1,7 +1,5 @@
 package ru.otus.hw.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.hw.dto.CreateGenreRequestDto;
 import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.GenreDto;
@@ -27,30 +27,33 @@ public class GenreRestController {
     private final GenreService genreService;
     
     @GetMapping("/api/v1/genre")
-    public List<GenreDto> listAllGenres() {
+    public Flux<GenreDto> listAllGenres() {
         return genreService.findAll();
     }
 
     @GetMapping("/api/v1/genre/{genreId}")
-    public GenreDto getGenreById(@PathVariable Long genreId) {
+    public Mono<GenreDto> getGenreById(@PathVariable Long genreId) {
         return genreService.findById(genreId);
     }
 
     @DeleteMapping("/api/v1/genre/{genreId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteGenre(@PathVariable Long genreId) {
-        genreService.deleteById(genreId);
+    public Mono<Void> deleteGenre(@PathVariable Long genreId) {
+        return genreService.deleteById(genreId);
     }
 
     @PostMapping("/api/v1/genre")
     @ResponseStatus(HttpStatus.CREATED)
-    public CreatedEntityDto createGenre(@RequestBody @Valid CreateGenreRequestDto requestDto) {
-        var genre = genreService.insert(requestDto);
-        return new CreatedEntityDto(genre.id());
+    public Mono<CreatedEntityDto> createGenre(@RequestBody @Valid CreateGenreRequestDto requestDto) {
+        return genreService.insert(requestDto)
+            .map(genre -> new CreatedEntityDto(genre.id()));
     }    
 
     @PutMapping("/api/v1/genre/{genreId}")
-    public GenreDto updateGenre(@PathVariable Long genreId, @RequestBody @Valid UpdateGenreRequestDto requestDto) {
+    public Mono<GenreDto> updateGenre(
+        @PathVariable Long genreId, 
+        @RequestBody @Valid UpdateGenreRequestDto requestDto
+    ) {
         return genreService.update(genreId, requestDto);
     }
 }

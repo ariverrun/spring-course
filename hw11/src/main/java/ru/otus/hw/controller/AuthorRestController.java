@@ -50,7 +50,10 @@ public class AuthorRestController {
     }
 
     @PutMapping("/api/v1/author/{authorId}")
-    public Mono<AuthorDto> updateAuthor(@PathVariable Long authorId, @RequestBody @Valid UpdateAuthorRequestDto requestDto) {
+    public Mono<AuthorDto> updateAuthor(
+        @PathVariable Long authorId, 
+        @RequestBody @Valid UpdateAuthorRequestDto requestDto
+    ) {
         return authorService.update(authorId, requestDto);
     }
 }
