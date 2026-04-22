@@ -2,6 +2,7 @@ package ru.otus.hw.dto;
 
 import java.util.Set;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,8 @@ public record UpdateBookRequestDto(
     @NotNull
     Long authorId,
     @NotEmpty
-    Set<Long> genreIds
+    @Valid
+    Set< @NotNull Long> genreIds
 ) {    
 }
 
