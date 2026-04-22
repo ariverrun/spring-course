@@ -1,16 +1,16 @@
 package ru.otus.hw.services;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -24,34 +24,46 @@ public class CommentServiceImpl implements CommentService {
     
     @Override
     @Transactional
-    public CommentDto insert(CreateCommentDto dto) {
-        var comment = new Comment(0, getBookById(dto.bookId()), dto.text());
-        return mapCommentToDto(commentRepository.save(comment));
+    public Mono<CommentDto> insert(CreateCommentDto dto) {
+        return Mono.fromCallable(() -> bookRepository.findById(dto.bookId())
+            .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(dto.bookId()))))
+            .flatMap(book -> Mono.fromCallable(() -> {
+                var comment = new Comment(0, book, dto.text());
+                return commentRepository.save(comment);
+            }))
+            .map(this::mapCommentToDto)
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     @Transactional
-    public CommentDto update(UpdateCommentDto dto) {
-        var comment = commentRepository.findById(dto.id())
+    public Mono<CommentDto> update(UpdateCommentDto dto) {
+        return Mono.fromCallable(() -> {
+            var comment = commentRepository.findById(dto.id())
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(dto.id())));
-        comment.setText(dto.text());
-        return mapCommentToDto(commentRepository.save(comment));
+            comment.setText(dto.text());
+            return commentRepository.save(comment);
+        })
+        .map(this::mapCommentToDto)
+        .subscribeOn(Schedulers.boundedElastic());        
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CommentDto> findByBookId(Long bookId) {
-        return commentRepository.findByBookId(bookId).stream()
-            .map(c -> mapCommentToDto(c))
-            .toList();
+    public Flux<CommentDto> findByBookId(Long bookId) {
+        return Mono.fromCallable(() -> commentRepository.findByBookId(bookId))
+                .flatMapMany(Flux::fromIterable)
+                .map(this::mapCommentToDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CommentDto findById(long id) {
-        var comment = commentRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));
-        return mapCommentToDto(comment);
+    public Mono<CommentDto> findById(long id) {
+        return Mono.fromCallable(() -> commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id))))
+                .map(this::mapCommentToDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private CommentDto mapCommentToDto(Comment comment) {
@@ -65,12 +77,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void deleteById(long id) {
-        commentRepository.deleteById(id);
+    public Mono<Void> deleteById(long id) {
+        return Mono.fromRunnable(() -> commentRepository.deleteById(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
-
-    private Book getBookById(Long bookId) {
-        return bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(bookId)));
-    } 
 }
