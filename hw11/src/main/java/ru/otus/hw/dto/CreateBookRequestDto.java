@@ -12,8 +12,8 @@ public record CreateBookRequestDto(
     @Size(min = 2, max = 20)
     String title,
     @NotNull
-    Long authorId,
+    String authorId,
     @NotEmpty
-    Set<Long> genreIds
+    Set<String> genreIds
 ) {
 }

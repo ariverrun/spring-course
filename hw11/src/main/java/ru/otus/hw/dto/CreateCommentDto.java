@@ -9,7 +9,7 @@ public record CreateCommentDto(
     @Size(min = 2, max = 1024)
     String text,
     @NotNull
-    Long bookId
+    String bookId
 ) {
     
 }

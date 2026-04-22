@@ -13,10 +13,10 @@ public record UpdateBookRequestDto(
     @Size(min = 2, max = 20)
     String title,
     @NotNull
-    Long authorId,
+    String authorId,
     @NotEmpty
     @Valid
-    Set< @NotNull Long> genreIds
+    Set< @NotNull String> genreIds
 ) {    
 }
 

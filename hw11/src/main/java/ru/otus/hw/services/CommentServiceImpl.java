@@ -1,12 +1,10 @@
 package ru.otus.hw.services;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.UpdateCommentDto;
@@ -19,51 +17,43 @@ import ru.otus.hw.repositories.CommentRepository;
 @Service
 public class CommentServiceImpl implements CommentService {
     private final BookRepository bookRepository;
-
     private final CommentRepository commentRepository;
     
     @Override
-    @Transactional
     public Mono<CommentDto> insert(CreateCommentDto dto) {
-        return Mono.fromCallable(() -> bookRepository.findById(dto.bookId())
-            .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(dto.bookId()))))
-            .flatMap(book -> Mono.fromCallable(() -> {
-                var comment = new Comment(0, book, dto.text());
+        return bookRepository.findById(dto.bookId())
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Book with id %s not found".formatted(dto.bookId()))))
+            .flatMap(book -> {
+                Comment comment = new Comment();
+                comment.setText(dto.text());
+                comment.setBook(book);
                 return commentRepository.save(comment);
-            }))
-            .map(this::mapCommentToDto)
-            .subscribeOn(Schedulers.boundedElastic());
+            })
+            .map(this::mapCommentToDto);
     }
 
     @Override
-    @Transactional
     public Mono<CommentDto> update(UpdateCommentDto dto) {
-        return Mono.fromCallable(() -> {
-            var comment = commentRepository.findById(dto.id())
-                .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(dto.id())));
-            comment.setText(dto.text());
-            return commentRepository.save(comment);
-        })
-        .map(this::mapCommentToDto)
-        .subscribeOn(Schedulers.boundedElastic());        
+        return commentRepository.findById(dto.id())
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(dto.id()))))
+            .flatMap(comment -> {
+                comment.setText(dto.text());
+                return commentRepository.save(comment);
+            })
+            .map(this::mapCommentToDto);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Flux<CommentDto> findByBookId(Long bookId) {
-        return Mono.fromCallable(() -> commentRepository.findByBookId(bookId))
-                .flatMapMany(Flux::fromIterable)
-                .map(this::mapCommentToDto)
-                .subscribeOn(Schedulers.boundedElastic());
+    public Flux<CommentDto> findByBookId(String bookId) {
+        return commentRepository.findByBookId(bookId)
+            .map(this::mapCommentToDto);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Mono<CommentDto> findById(long id) {
-        return Mono.fromCallable(() -> commentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id))))
-                .map(this::mapCommentToDto)
-                .subscribeOn(Schedulers.boundedElastic());
+    public Mono<CommentDto> findById(String id) {
+        return commentRepository.findById(id)
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(id))))
+            .map(this::mapCommentToDto);
     }
 
     private CommentDto mapCommentToDto(Comment comment) {
@@ -72,14 +62,11 @@ public class CommentServiceImpl implements CommentService {
             comment.getText(),
             comment.getBook().getId(),
             comment.getBook().getTitle()
-        );        
+        );
     }
 
     @Override
-    @Transactional
-    public Mono<Void> deleteById(long id) {
-        return Mono.fromRunnable(() -> commentRepository.deleteById(id))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+    public Mono<Void> deleteById(String id) {
+        return commentRepository.deleteById(id);
     }
 }

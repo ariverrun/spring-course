@@ -2,20 +2,12 @@ server:
   port: 8040
 
 spring:
-  datasource:
-    url: jdbc:h2:mem:maindb
+  data:
+    mongodb:
+      uri: mongodb://usr:pwd@localhost:27017/hw08?authSource=admin
 
-  jpa:
-    hibernate:
-      ddl-auto: none 
-
-    properties:
-      hibernate:
-        '[format_sql]': true
-
-    show-sql: true
-  
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
+mongock:
+  enabled: false
+  migration-scan-package:
+    - ru.otus.hw.migrations
+ 

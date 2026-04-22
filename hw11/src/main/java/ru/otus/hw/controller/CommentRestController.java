@@ -29,18 +29,18 @@ public class CommentRestController {
     private final CommentService commentService;
     
     @GetMapping("/api/v1/comment")
-    public Flux<CommentDto> getCommentsByBookId(@RequestParam Long bookId) {
+    public Flux<CommentDto> getCommentsByBookId(@RequestParam String bookId) {
         return commentService.findByBookId(bookId);
     }
 
     @GetMapping("/api/v1/comment/{commentId}")
-    public Mono<CommentDto> getCommentById(@PathVariable Long commentId) {
+    public Mono<CommentDto> getCommentById(@PathVariable String commentId) {
         return commentService.findById(commentId);
     }
 
     @DeleteMapping("/api/v1/comment/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> deleteComment(@PathVariable Long commentId) {
+    public Mono<Void> deleteComment(@PathVariable String commentId) {
         return commentService.deleteById(commentId);
     }
 
@@ -53,7 +53,7 @@ public class CommentRestController {
 
     @PutMapping("/api/v1/comment/{commentId}")
     public Mono<CommentDto> updateComment(
-        @PathVariable Long commentId, 
+        @PathVariable String commentId, 
         @RequestBody @Valid UpdateCommentRequestDto requestDto
     ) {
         return commentService.update(new UpdateCommentDto(commentId, requestDto.text()));

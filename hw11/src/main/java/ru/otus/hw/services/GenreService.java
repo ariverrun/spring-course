@@ -9,11 +9,11 @@ import ru.otus.hw.dto.UpdateGenreRequestDto;
 public interface GenreService {
     Flux<GenreDto> findAll();
 
-    Mono<GenreDto> findById(long id);
+    Mono<GenreDto> findById(String id);
 
     Mono<GenreDto> insert(CreateGenreRequestDto dto);
 
-    Mono<GenreDto> update(long id, UpdateGenreRequestDto dto);
+    Mono<GenreDto> update(String id, UpdateGenreRequestDto dto);
 
-    Mono<Void> deleteById(long id);
+    Mono<Void> deleteById(String id);
 }

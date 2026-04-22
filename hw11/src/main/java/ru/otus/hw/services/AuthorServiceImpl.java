@@ -2,11 +2,9 @@ package ru.otus.hw.services;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.CreateAuthorRequestDto;
 import ru.otus.hw.dto.UpdateAuthorRequestDto;
@@ -21,18 +19,15 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Flux<AuthorDto> findAll() {
-        return Mono.fromCallable(authorRepository::findAll)
-                .flatMapMany(Flux::fromIterable)
-                .map(this::mapAuthorToDto)
-                .subscribeOn(Schedulers.boundedElastic());
+        return authorRepository.findAll()
+            .map(this::mapAuthorToDto);
     }
 
     @Override
-    public Mono<AuthorDto> findById(long id) {
-        return Mono.fromCallable(() -> authorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id))))
-                .map(this::mapAuthorToDto)
-                .subscribeOn(Schedulers.boundedElastic());
+    public Mono<AuthorDto> findById(String id) {
+        return authorRepository.findById(id)
+            .map(this::mapAuthorToDto)
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))));
     }
 
     private AuthorDto mapAuthorToDto(Author author) {
@@ -40,34 +35,25 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    @Transactional
     public Mono<AuthorDto> insert(CreateAuthorRequestDto dto) {
-        return Mono.fromCallable(() -> {
-            var author = new Author(0, dto.fullName());
-            return authorRepository.save(author);
-        })
-        .map(this::mapAuthorToDto)
-        .subscribeOn(Schedulers.boundedElastic());
+        var author = new Author(null, dto.fullName());
+        return authorRepository.save(author)
+            .map(this::mapAuthorToDto);
     }
 
     @Override
-    @Transactional
-    public Mono<AuthorDto> update(long id, UpdateAuthorRequestDto dto) {
-        return Mono.fromCallable(() -> {
-            var author = authorRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
-            author.setFullName(dto.fullName());
-            return authorRepository.save(author);
-        })
-        .map(this::mapAuthorToDto)
-        .subscribeOn(Schedulers.boundedElastic());
+    public Mono<AuthorDto> update(String id, UpdateAuthorRequestDto dto) {
+        return authorRepository.findById(id)
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))))
+            .flatMap(author -> {
+                author.setFullName(dto.fullName());
+                return authorRepository.save(author);
+            })
+            .map(this::mapAuthorToDto);
     }
 
     @Override
-    @Transactional
-    public Mono<Void> deleteById(long id) {
-        return Mono.fromRunnable(() -> authorRepository.deleteById(id))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+    public Mono<Void> deleteById(String id) {
+        return authorRepository.deleteById(id);
     }
 }

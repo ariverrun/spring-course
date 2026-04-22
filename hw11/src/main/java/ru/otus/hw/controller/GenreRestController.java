@@ -32,13 +32,13 @@ public class GenreRestController {
     }
 
     @GetMapping("/api/v1/genre/{genreId}")
-    public Mono<GenreDto> getGenreById(@PathVariable Long genreId) {
+    public Mono<GenreDto> getGenreById(@PathVariable String genreId) {
         return genreService.findById(genreId);
     }
 
     @DeleteMapping("/api/v1/genre/{genreId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> deleteGenre(@PathVariable Long genreId) {
+    public Mono<Void> deleteGenre(@PathVariable String genreId) {
         return genreService.deleteById(genreId);
     }
 
@@ -51,7 +51,7 @@ public class GenreRestController {
 
     @PutMapping("/api/v1/genre/{genreId}")
     public Mono<GenreDto> updateGenre(
-        @PathVariable Long genreId, 
+        @PathVariable String genreId, 
         @RequestBody @Valid UpdateGenreRequestDto requestDto
     ) {
         return genreService.update(genreId, requestDto);

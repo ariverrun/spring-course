@@ -12,9 +12,9 @@ public interface CommentService {
 
     Mono<CommentDto> update(UpdateCommentDto dto);
 
-    Flux<CommentDto> findByBookId(Long bookId);
+    Flux<CommentDto> findByBookId(String bookId);
 
-    Mono<CommentDto> findById(long id);
+    Mono<CommentDto> findById(String id);
 
-    Mono<Void> deleteById(long id);
+    Mono<Void> deleteById(String id);
 }

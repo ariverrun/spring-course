@@ -2,11 +2,9 @@ package ru.otus.hw.services;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import ru.otus.hw.dto.CreateGenreRequestDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateGenreRequestDto;
@@ -21,50 +19,38 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Flux<GenreDto> findAll() {
-        return Mono.fromCallable(genreRepository::findAll)
-            .flatMapMany(Flux::fromIterable)
-            .map(this::mapGenreToDto)
-            .subscribeOn(Schedulers.boundedElastic());
+        return genreRepository.findAll()
+            .map(this::mapGenreToDto);
     }
 
     @Override
-    public Mono<GenreDto> findById(long id) {
-        return Mono.fromCallable(() -> genreRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id))))
+    public Mono<GenreDto> findById(String id) {
+        return genreRepository.findById(id)
             .map(this::mapGenreToDto)
-            .subscribeOn(Schedulers.boundedElastic());
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))));
     } 
     
     @Override
-    @Transactional
     public Mono<GenreDto> insert(CreateGenreRequestDto dto) {
-        return Mono.fromCallable(() -> {
-            var genre = new Genre(0, dto.name());
-            return genreRepository.save(genre);
-        })
-        .map(this::mapGenreToDto)
-        .subscribeOn(Schedulers.boundedElastic());
+        var genre = new Genre(null, dto.name());
+        return genreRepository.save(genre)
+            .map(this::mapGenreToDto);
     }
 
     @Override
-    @Transactional
-    public Mono<GenreDto> update(long id, UpdateGenreRequestDto dto) {
-        return Mono.fromCallable(() -> {
-            var genre = genreRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));
-            genre.setName(dto.name());
-            return genreRepository.save(genre);
-        })
-        .map(this::mapGenreToDto)
-        .subscribeOn(Schedulers.boundedElastic());
+    public Mono<GenreDto> update(String id, UpdateGenreRequestDto dto) {
+        return genreRepository.findById(id)
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))))
+            .flatMap(genre -> {
+                genre.setName(dto.name());
+                return genreRepository.save(genre);
+            })
+            .map(this::mapGenreToDto);
     }    
 
     @Override
-    @Transactional
-    public Mono<Void> deleteById(long id) {
-        return Mono.fromRunnable(() -> genreRepository.deleteById(id))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+    public Mono<Void> deleteById(String id) {
+        return genreRepository.deleteById(id);
     }
 
     private GenreDto mapGenreToDto(Genre genre) {

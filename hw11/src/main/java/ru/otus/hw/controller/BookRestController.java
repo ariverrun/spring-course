@@ -32,13 +32,13 @@ public class BookRestController {
     }
 
     @GetMapping("/api/v1/book/{bookId}")
-    public Mono<BookDto> getBookById(@PathVariable Long bookId) {
+    public Mono<BookDto> getBookById(@PathVariable String bookId) {
         return bookService.findById(bookId);
     }
 
     @DeleteMapping("/api/v1/book/{bookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> deleteBook(@PathVariable Long bookId) {
+    public Mono<Void> deleteBook(@PathVariable String bookId) {
         return bookService.deleteById(bookId);
     }
 
@@ -50,7 +50,10 @@ public class BookRestController {
    }
 
     @PutMapping("/api/v1/book/{bookId}")
-    public Mono<BookDto> updateBook(@PathVariable Long bookId, @RequestBody @Valid UpdateBookRequestDto requestDto) {
+    public Mono<BookDto> updateBook(
+        @PathVariable String bookId, 
+        @RequestBody @Valid UpdateBookRequestDto requestDto
+    ) {
         return bookService.update(bookId, requestDto);
     }
 }

@@ -32,13 +32,13 @@ public class AuthorRestController {
     }
 
     @GetMapping("/api/v1/author/{authorId}")
-    public Mono<AuthorDto> getAuthorById(@PathVariable Long authorId) {
+    public Mono<AuthorDto> getAuthorById(@PathVariable String authorId) {
         return authorService.findById(authorId);
     }
 
     @DeleteMapping("/api/v1/author/{authorId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> deleteAuthor(@PathVariable Long authorId) {
+    public Mono<Void> deleteAuthor(@PathVariable String authorId) {
         return authorService.deleteById(authorId);
     }
 
@@ -51,7 +51,7 @@ public class AuthorRestController {
 
     @PutMapping("/api/v1/author/{authorId}")
     public Mono<AuthorDto> updateAuthor(
-        @PathVariable Long authorId, 
+        @PathVariable String authorId, 
         @RequestBody @Valid UpdateAuthorRequestDto requestDto
     ) {
         return authorService.update(authorId, requestDto);

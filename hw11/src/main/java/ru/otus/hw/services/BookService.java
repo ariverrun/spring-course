@@ -7,13 +7,13 @@ import ru.otus.hw.dto.CreateBookRequestDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 
 public interface BookService {
-    Mono<BookDto> findById(long id);
+    Mono<BookDto> findById(String id);
 
     Flux<BookDto> findAll();
 
     Mono<BookDto> insert(CreateBookRequestDto dto);
 
-    Mono<BookDto> update(long id, UpdateBookRequestDto dto);
+    Mono<BookDto> update(String id, UpdateBookRequestDto dto);
 
-    Mono<Void> deleteById(long id);
+    Mono<Void> deleteById(String id);
 }

@@ -1,16 +1,14 @@
 package ru.otus.hw.repositories;
 
-import java.util.List;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import reactor.core.publisher.Flux;
+import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentRepository extends ReactiveMongoRepository<Comment, String> {
     
-    @EntityGraph(attributePaths = {"book"})
-    List<Comment> findByBookId(Long bookId);
+    Flux<Comment> findByBookId(String bookId);
 
-    void deleteByBookId(Long bookId);
+    void deleteByBook(Book book);
 }
