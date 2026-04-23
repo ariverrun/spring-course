@@ -16,6 +16,7 @@ import ru.otus.hw.dto.CreateBookRequestDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.BookMapper;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
@@ -33,17 +34,19 @@ public class BookServiceImpl implements BookService {
 
     private final CommentRepository commentRepository;
 
+    private final BookMapper bookMapper;
+
     @Override
     public Mono<BookDto> findById(String id) {
         return bookRepository.findById(id)
                 .switchIfEmpty(Mono.error(new EntityNotFoundException("Book with id %s not found".formatted(id))))
-                .flatMap(this::mapBookToDto);
+                .map(bookMapper::mapBookToDto);
     }
 
     @Override
     public Flux<BookDto> findAll() {
         return bookRepository.findAll()
-                .flatMap(this::mapBookToDto);
+                .map(bookMapper::mapBookToDto);
     }
 
     @Override
@@ -64,7 +67,7 @@ public class BookServiceImpl implements BookService {
                         return bookRepository.save(book);
                     });
             })
-            .flatMap(this::mapBookToDto);
+            .map(bookMapper::mapBookToDto);
     }
 
     @Override
@@ -87,29 +90,13 @@ public class BookServiceImpl implements BookService {
                         return bookRepository.save(book);
                     });
             })
-            .flatMap(this::mapBookToDto);
+            .map(bookMapper::mapBookToDto);
     }
 
     @Override
     public Mono<Void> deleteById(String id) {
         return commentRepository.deleteByBookId(id)
             .then(bookRepository.deleteById(id));
-    }
-
-    private Mono<AuthorDto> getAuthorById(String authorId) {
-        return authorRepository.findById(authorId)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(authorId))))
-            .map(author -> new AuthorDto(author.getId(), author.getFullName()));
-    }
-
-    private Mono<Set<GenreDto>> getGenresByIds(Set<String> genreIds) {
-        if (isEmpty(genreIds)) {
-            return Mono.just(Set.of());
-        }
-        
-        return genreRepository.findAllById(genreIds)
-            .map(genre -> new GenreDto(genre.getId(), genre.getName()))
-            .collect(Collectors.toSet());
     }
 
     private Mono<AuthorDto> validateAuthor(String authorId) {
@@ -133,24 +120,5 @@ public class BookServiceImpl implements BookService {
                 }
                 return Mono.just(genres);
             });
-    }
-
-    private Mono<BookDto> mapBookToDto(Book book) {
-        return Mono.zip(
-            getAuthorById(book.getAuthor().getId()),
-            getGenresByIds(book.getGenres().stream()
-                .map(genre -> genre.getId())
-                .collect(Collectors.toSet()))
-        ).map(tuple -> {
-            AuthorDto author = tuple.getT1();
-            Set<GenreDto> genres = tuple.getT2();
-            
-            return new BookDto(
-                book.getId(),
-                book.getTitle(),
-                author,
-                genres
-            );
-        });
-    }    
+    } 
 }

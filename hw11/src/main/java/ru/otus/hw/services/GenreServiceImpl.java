@@ -9,6 +9,7 @@ import ru.otus.hw.dto.CreateGenreRequestDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateGenreRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.GenreMapper;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
@@ -20,16 +21,18 @@ public class GenreServiceImpl implements GenreService {
 
     private final BookRepository bookRepository;
 
+    private final GenreMapper genreMapper;
+
     @Override
     public Flux<GenreDto> findAll() {
         return genreRepository.findAll()
-            .map(this::mapGenreToDto);
+            .map(genreMapper::mapGenreToDto);
     }
 
     @Override
     public Mono<GenreDto> findById(String id) {
         return genreRepository.findById(id)
-            .map(this::mapGenreToDto)
+            .map(genreMapper::mapGenreToDto)
             .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))));
     } 
     
@@ -37,7 +40,7 @@ public class GenreServiceImpl implements GenreService {
     public Mono<GenreDto> insert(CreateGenreRequestDto dto) {
         var genre = new Genre(null, dto.name());
         return genreRepository.save(genre)
-            .map(this::mapGenreToDto);
+            .map(genreMapper::mapGenreToDto);
     }
 
     @Override
@@ -48,7 +51,7 @@ public class GenreServiceImpl implements GenreService {
                 genre.setName(dto.name());
                 return genreRepository.save(genre);
             })
-            .map(this::mapGenreToDto);
+            .map(genreMapper::mapGenreToDto);
     }    
 
     @Override
@@ -59,10 +62,5 @@ public class GenreServiceImpl implements GenreService {
                 return bookRepository.save(book);
             })
             .then(genreRepository.deleteById(id));
-    }
-
-
-    private GenreDto mapGenreToDto(Genre genre) {
-        return new GenreDto(genre.getId(), genre.getName());
     }
 }

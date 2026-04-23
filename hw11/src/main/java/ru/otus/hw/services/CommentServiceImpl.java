@@ -9,6 +9,7 @@ import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.CommentMapper;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -19,6 +20,8 @@ public class CommentServiceImpl implements CommentService {
     private final BookRepository bookRepository;
 
     private final CommentRepository commentRepository;
+
+    private final CommentMapper commentMapper;
     
     @Override
     public Mono<CommentDto> insert(CreateCommentDto dto) {
@@ -30,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
                 comment.setBookId(book.getId());
                 return commentRepository.save(comment);
             })
-            .map(this::mapCommentToDto);
+            .map(commentMapper::mapCommentToDto);
     }
 
     @Override
@@ -41,32 +44,24 @@ public class CommentServiceImpl implements CommentService {
                 comment.setText(dto.text());
                 return commentRepository.save(comment);
             })
-            .map(this::mapCommentToDto);
+            .map(commentMapper::mapCommentToDto);
     }
 
     @Override
     public Flux<CommentDto> findByBookId(String bookId) {
         return commentRepository.findByBookId(bookId)
-            .map(this::mapCommentToDto);
+            .map(commentMapper::mapCommentToDto);
     }
 
     @Override
     public Mono<CommentDto> findById(String id) {
         return commentRepository.findById(id)
             .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(id))))
-            .map(this::mapCommentToDto);
+            .map(commentMapper::mapCommentToDto);
     }
 
     @Override
     public Mono<Void> deleteById(String id) {
         return commentRepository.deleteById(id);
-    }
-
-    private CommentDto mapCommentToDto(Comment comment) {
-        return new CommentDto(
-            comment.getId(),
-            comment.getText(),
-            comment.getBookId()
-        );
-    }    
+    } 
 }
