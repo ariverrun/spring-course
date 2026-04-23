@@ -8,4 +8,4 @@ ps:
 	docker compose ps -a
 
 mongosh:
-	docker compose exec mongo mongosh -u usr -p pwd --authenticationDatabase hw08
+	docker compose exec mongo mongosh -u usr -p pwd --authenticationDatabase hw11

@@ -17,6 +17,7 @@ import ru.otus.hw.repositories.CommentRepository;
 @Service
 public class CommentServiceImpl implements CommentService {
     private final BookRepository bookRepository;
+
     private final CommentRepository commentRepository;
     
     @Override
@@ -26,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
             .flatMap(book -> {
                 Comment comment = new Comment();
                 comment.setText(dto.text());
-                comment.setBook(book);
+                comment.setBookId(book.getId());
                 return commentRepository.save(comment);
             })
             .map(this::mapCommentToDto);
@@ -56,17 +57,16 @@ public class CommentServiceImpl implements CommentService {
             .map(this::mapCommentToDto);
     }
 
-    private CommentDto mapCommentToDto(Comment comment) {
-        return new CommentDto(
-            comment.getId(),
-            comment.getText(),
-            comment.getBook().getId(),
-            comment.getBook().getTitle()
-        );
-    }
-
     @Override
     public Mono<Void> deleteById(String id) {
         return commentRepository.deleteById(id);
     }
+
+    private CommentDto mapCommentToDto(Comment comment) {
+        return new CommentDto(
+            comment.getId(),
+            comment.getText(),
+            comment.getBookId()
+        );
+    }    
 }

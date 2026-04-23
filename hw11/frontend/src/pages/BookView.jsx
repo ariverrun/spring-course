@@ -43,7 +43,7 @@ function BookView() {
     fetch('/api/v1/comment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, bookId: parseInt(id) })
+      body: JSON.stringify({ text, bookId: id })
     })
       .then(() => fetch(`/api/v1/comment?bookId=${id}`))
       .then(response => response.json())

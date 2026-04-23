@@ -19,14 +19,19 @@ import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
+import ru.otus.hw.repositories.CommentRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
 @RequiredArgsConstructor
 @Service
 public class BookServiceImpl implements BookService {
     private final AuthorRepository authorRepository;
+
     private final GenreRepository genreRepository;
+
     private final BookRepository bookRepository;
+
+    private final CommentRepository commentRepository;
 
     @Override
     public Mono<BookDto> findById(String id) {
@@ -39,25 +44,6 @@ public class BookServiceImpl implements BookService {
     public Flux<BookDto> findAll() {
         return bookRepository.findAll()
                 .flatMap(this::mapBookToDto);
-    }
-
-    private Mono<BookDto> mapBookToDto(Book book) {
-        return Mono.zip(
-            getAuthorById(book.getAuthor().getId()),
-            getGenresByIds(book.getGenres().stream()
-                .map(genre -> genre.getId())
-                .collect(Collectors.toSet()))
-        ).map(tuple -> {
-            AuthorDto author = tuple.getT1();
-            Set<GenreDto> genres = tuple.getT2();
-            
-            return new BookDto(
-                book.getId(),
-                book.getTitle(),
-                author,
-                genres
-            );
-        });
     }
 
     @Override
@@ -106,7 +92,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return bookRepository.deleteById(id);
+        return commentRepository.deleteByBookId(id)
+            .then(bookRepository.deleteById(id));
     }
 
     private Mono<AuthorDto> getAuthorById(String authorId) {
@@ -147,4 +134,23 @@ public class BookServiceImpl implements BookService {
                 return Mono.just(genres);
             });
     }
+
+    private Mono<BookDto> mapBookToDto(Book book) {
+        return Mono.zip(
+            getAuthorById(book.getAuthor().getId()),
+            getGenresByIds(book.getGenres().stream()
+                .map(genre -> genre.getId())
+                .collect(Collectors.toSet()))
+        ).map(tuple -> {
+            AuthorDto author = tuple.getT1();
+            Set<GenreDto> genres = tuple.getT2();
+            
+            return new BookDto(
+                book.getId(),
+                book.getTitle(),
+                author,
+                genres
+            );
+        });
+    }    
 }

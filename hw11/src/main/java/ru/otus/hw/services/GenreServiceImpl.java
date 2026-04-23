@@ -10,12 +10,15 @@ import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateGenreRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Genre;
+import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
 @RequiredArgsConstructor
 @Service
 public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepository;
+
+    private final BookRepository bookRepository;
 
     @Override
     public Flux<GenreDto> findAll() {
@@ -50,8 +53,14 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return genreRepository.deleteById(id);
+        return bookRepository.findBooksByGenreId(id)
+            .flatMap(book -> {
+                book.getGenres().removeIf(genre -> genre.getId().equals(id));
+                return bookRepository.save(book);
+            })
+            .then(genreRepository.deleteById(id));
     }
+
 
     private GenreDto mapGenreToDto(Genre genre) {
         return new GenreDto(genre.getId(), genre.getName());

@@ -37,7 +37,7 @@ function BookForm() {
     const selected = [];
     for (let i = 0; i < options.length; i++) {
       if (options[i].selected) {
-        selected.push(parseInt(options[i].value));
+        selected.push(options[i].value);
       }
     }
     setGenreIds(selected);
@@ -46,7 +46,7 @@ function BookForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    const bookData = { title, authorId: parseInt(authorId), genreIds };
+    const bookData = { title, authorId: authorId, genreIds };
     
     const url = isEdit ? `/api/v1/book/${id}` : '/api/v1/book';
     const method = isEdit ? 'PUT' : 'POST';

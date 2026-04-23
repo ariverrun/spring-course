@@ -11,11 +11,14 @@ import ru.otus.hw.dto.UpdateAuthorRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
+import ru.otus.hw.repositories.BookRepository;
 
 @RequiredArgsConstructor
 @Service
 public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
+
+    private final BookRepository bookRepository;
 
     @Override
     public Flux<AuthorDto> findAll() {
@@ -28,10 +31,6 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.findById(id)
             .map(this::mapAuthorToDto)
             .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))));
-    }
-
-    private AuthorDto mapAuthorToDto(Author author) {
-        return new AuthorDto(author.getId(), author.getFullName());
     }
 
     @Override
@@ -54,6 +53,15 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return authorRepository.deleteById(id);
+        return authorRepository.findById(id)
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))))
+            .flatMap(author -> {
+                return bookRepository.deleteByAuthor(author)
+                    .then(authorRepository.deleteById(id));
+            });
     }
+
+    private AuthorDto mapAuthorToDto(Author author) {
+        return new AuthorDto(author.getId(), author.getFullName());
+    }    
 }
