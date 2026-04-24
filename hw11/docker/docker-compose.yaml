@@ -1,0 +1,21 @@
+services:
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: usr
+      MONGO_INITDB_ROOT_PASSWORD: pwd
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - mongo_network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  mongo_network:
+    driver: bridge

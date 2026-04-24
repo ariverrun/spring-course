@@ -1,0 +1,15 @@
+server:
+  port: 8040
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://usr:pwd@localhost:27017/hw11?authSource=admin
+      database: hw11
+
+mongock:
+  enabled: true
+  transaction-enabled: false
+  migration-scan-package:
+    - ru.otus.hw.migrations
+ 
