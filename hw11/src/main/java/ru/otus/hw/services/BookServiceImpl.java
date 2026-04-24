@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
-import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.mapper.BookMapper;
+import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -54,18 +54,15 @@ public class BookServiceImpl implements BookService {
         return validateAuthor(dto.authorId())
             .zipWith(validateGenres(dto.genreIds()))
             .flatMap(tuple -> {
+                Author author = tuple.getT1();
+                Set<Genre> genres = tuple.getT2();
+                
                 var book = new Book();
                 book.setTitle(dto.title());
+                book.setAuthor(author);
+                book.setGenres(genres.stream().collect(Collectors.toList()));
                 
-                return authorRepository.findById(dto.authorId())
-                    .flatMap(author -> {
-                        book.setAuthor(author);
-                        return genreRepository.findAllById(dto.genreIds()).collectList();
-                    })
-                    .flatMap(genres -> {
-                        book.setGenres(genres);
-                        return bookRepository.save(book);
-                    });
+                return bookRepository.save(book);
             })
             .map(bookMapper::mapBookToDto);
     }
@@ -78,17 +75,14 @@ public class BookServiceImpl implements BookService {
             .zipWith(validateGenres(dto.genreIds()))
             .flatMap(tuple -> {
                 Book book = tuple.getT1().getT1();
-                book.setTitle(dto.title());
+                Author author = tuple.getT1().getT2();
+                Set<Genre> genres = tuple.getT2();
                 
-                return authorRepository.findById(dto.authorId())
-                    .flatMap(author -> {
-                        book.setAuthor(author);
-                        return genreRepository.findAllById(dto.genreIds()).collectList();
-                    })
-                    .flatMap(genres -> {
-                        book.setGenres(genres);
-                        return bookRepository.save(book);
-                    });
+                book.setTitle(dto.title());
+                book.setAuthor(author);
+                book.setGenres(genres.stream().collect(Collectors.toList()));
+                
+                return bookRepository.save(book);
             })
             .map(bookMapper::mapBookToDto);
     }
@@ -99,19 +93,17 @@ public class BookServiceImpl implements BookService {
             .then(bookRepository.deleteById(id));
     }
 
-    private Mono<AuthorDto> validateAuthor(String authorId) {
+        private Mono<Author> validateAuthor(String authorId) {
         return authorRepository.findById(authorId)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(authorId))))
-            .map(author -> new AuthorDto(author.getId(), author.getFullName()));
+            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(authorId))));
     }
 
-    private Mono<Set<GenreDto>> validateGenres(Set<String> genreIds) {
+    private Mono<Set<Genre>> validateGenres(Set<String> genreIds) {
         if (isEmpty(genreIds)) {
             return Mono.error(new IllegalArgumentException("Genres ids must not be null or empty"));
         }
         
         return genreRepository.findAllById(genreIds)
-            .map(genre -> new GenreDto(genre.getId(), genre.getName()))
             .collect(Collectors.toSet())
             .flatMap(genres -> {
                 if (genres.size() != genreIds.size()) {
@@ -119,6 +111,6 @@ public class BookServiceImpl implements BookService {
                         "One or all genres with ids %s not found".formatted(genreIds)));
                 }
                 return Mono.just(genres);
-            });
-    } 
+             });
+    }
 }
