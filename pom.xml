@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>hw01</module>
+        <!-- <module>hw01</module>
         <module>hw02</module>
         <module>hw03</module>
         <module>hw04</module>
@@ -21,6 +21,7 @@
         <module>hw08</module>
         <module>hw09</module>
         <module>hw10</module>
-        <module>hw11</module>
+        <module>hw11</module> -->
+        <module>hw12</module>
     </modules>
 </project>
