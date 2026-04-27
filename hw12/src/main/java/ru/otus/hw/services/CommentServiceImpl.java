@@ -10,6 +10,7 @@ import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.CommentMapper;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.BookRepository;
@@ -21,12 +22,14 @@ public class CommentServiceImpl implements CommentService {
     private final BookRepository bookRepository;
 
     private final CommentRepository commentRepository;
+
+    private final CommentMapper commentMapper;
     
     @Override
     @Transactional
     public CommentDto insert(CreateCommentDto dto) {
         var comment = new Comment(0, getBookById(dto.bookId()), dto.text());
-        return mapCommentToDto(commentRepository.save(comment));
+        return commentMapper.mapCommentToDto(commentRepository.save(comment));
     }
 
     @Override
@@ -35,14 +38,14 @@ public class CommentServiceImpl implements CommentService {
         var comment = commentRepository.findById(dto.id())
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(dto.id())));
         comment.setText(dto.text());
-        return mapCommentToDto(commentRepository.save(comment));
+        return commentMapper.mapCommentToDto(commentRepository.save(comment));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CommentDto> findByBookId(Long bookId) {
         return commentRepository.findByBookId(bookId).stream()
-            .map(c -> mapCommentToDto(c))
+            .map(c -> commentMapper.mapCommentToDto(c))
             .toList();
     }
 
@@ -51,16 +54,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto findById(long id) {
         var comment = commentRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));
-        return mapCommentToDto(comment);
-    }
-
-    private CommentDto mapCommentToDto(Comment comment) {
-        return new CommentDto(
-            comment.getId(),
-            comment.getText(),
-            comment.getBook().getId(),
-            comment.getBook().getTitle()
-        );        
+        return commentMapper.mapCommentToDto(comment);
     }
 
     @Override

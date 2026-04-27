@@ -10,6 +10,7 @@ import ru.otus.hw.dto.CreateGenreRequestDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateGenreRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.GenreMapper;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.GenreRepository;
 
@@ -18,10 +19,12 @@ import ru.otus.hw.repositories.GenreRepository;
 public class GenreServiceImpl implements GenreService {
     private final GenreRepository genreRepository;
 
+    private final GenreMapper genreMapper;
+
     @Override
     public List<GenreDto> findAll() {
         return genreRepository.findAll().stream()
-            .map(g -> mapGenreToDto(g))
+            .map(g -> genreMapper.mapGenreToDto(g))
             .toList();
     }
 
@@ -29,14 +32,14 @@ public class GenreServiceImpl implements GenreService {
     public GenreDto findById(long id) {
         var genre = genreRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));
-        return mapGenreToDto(genre);
+        return genreMapper.mapGenreToDto(genre);
     } 
     
     @Override
     @Transactional
     public GenreDto insert(CreateGenreRequestDto dto) {
         var genre = new Genre(0, dto.name());
-        return mapGenreToDto(genreRepository.save(genre));
+        return genreMapper.mapGenreToDto(genreRepository.save(genre));
     }
 
     @Override
@@ -45,16 +48,12 @@ public class GenreServiceImpl implements GenreService {
         var genre = genreRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));
         genre.setName(dto.name());
-        return mapGenreToDto(genreRepository.save(genre));
+        return genreMapper.mapGenreToDto(genreRepository.save(genre));
     }    
 
     @Override
     @Transactional
     public void deleteById(long id) {
         genreRepository.deleteById(id);
-    }
-
-    private GenreDto mapGenreToDto(Genre genre) {
-        return new GenreDto(genre.getId(), genre.getName());
     }
 }

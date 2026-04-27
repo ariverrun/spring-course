@@ -4,18 +4,16 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
-import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.BookMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -32,12 +30,14 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
+    private final BookMapper bookMapper;
+
     @Override
     @Transactional(readOnly = true)
     public BookDto findById(long id) {
         var book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
-        return mapBookToDto(book);
+        return bookMapper.mapBookToDto(book);
     }
 
     @Override
@@ -45,25 +45,8 @@ public class BookServiceImpl implements BookService {
     public List<BookDto> findAll() {
         var books = bookRepository.findAll();
         return books.stream()
-            .map(book -> mapBookToDto(book))
+            .map(book -> bookMapper.mapBookToDto(book))
             .toList();
-    }
-
-    private BookDto mapBookToDto(Book book) {
-        return new BookDto(
-            book.getId(), 
-            book.getTitle(),
-            new AuthorDto(
-                book.getAuthor().getId(), 
-                book.getAuthor().getFullName()
-            ),
-            book.getGenres().stream()
-                .map(g -> new GenreDto(
-                    g.getId(),
-                    g.getName()
-                ))
-                .collect(Collectors.toSet())
-        );
     }
 
     @Override
@@ -75,7 +58,7 @@ public class BookServiceImpl implements BookService {
             getAuthorById(dto.authorId()), 
             getNotEmptyGenresListByIds(dto.genreIds())
         );
-        return mapBookToDto(bookRepository.save(book));
+        return bookMapper.mapBookToDto(bookRepository.save(book));
     }
 
     @Override
@@ -86,7 +69,7 @@ public class BookServiceImpl implements BookService {
         book.setTitle(dto.title());
         book.setAuthor(getAuthorById(dto.authorId()));
         book.setGenres(getNotEmptyGenresListByIds(dto.genreIds()));
-        return mapBookToDto(bookRepository.save(book));
+        return bookMapper.mapBookToDto(bookRepository.save(book));
     }
 
     @Override

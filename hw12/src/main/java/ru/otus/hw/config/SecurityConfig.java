@@ -22,9 +22,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    
+        
     private static final String[] PUBLIC_PATHS = {
         "/login", "/index.html", "/static/**", "/assets/**",
         "/*.js", "/*.css", "/*.ico", "/*.png"
@@ -34,6 +32,8 @@ public class SecurityConfig {
         "/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/me"
     };
     
+    private final ObjectMapper objectMapper = new ObjectMapper();
+  
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
