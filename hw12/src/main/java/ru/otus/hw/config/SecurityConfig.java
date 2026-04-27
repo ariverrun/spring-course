@@ -1,63 +1,102 @@
 package ru.otus.hw.config;
 
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    private static final String[] PUBLIC_PATHS = {
+        "/login", "/index.html", "/static/**", "/assets/**",
+        "/*.js", "/*.css", "/*.ico", "/*.png"
+    };
+    
+    private static final String[] AUTH_PATHS = {
+        "/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/me"
+    };
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login", "/index.html", "/static/**", "/assets/**", "/*.js", "/*.css", "/*.ico", "/*.png").permitAll()
-                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/me").permitAll()
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(PUBLIC_PATHS).permitAll()
+                .requestMatchers(AUTH_PATHS).permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/api/v1/auth/login")
-                .usernameParameter("username")
-                .passwordParameter("password")
-                .successHandler((request, response, authentication) -> {
-                    response.setStatus(200);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\": true, \"message\": \"Login successful\"}");
-                })
-                .failureHandler((request, response, exception) -> {
-                    response.setStatus(401);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\": false, \"message\": \"Invalid credentials\"}");
-                })
+                .successHandler(successHandler())
+                .failureHandler(failureHandler())
             )
             .logout(logout -> logout
                 .logoutUrl("/api/v1/auth/logout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    response.setStatus(200);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\": true, \"message\": \"Logout successful\"}");
-                })
+                .logoutSuccessHandler(logoutHandler())
             )
             .exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint((request, response, authException) -> {
-                    if (request.getRequestURI().startsWith("/api/")) {
-                        response.setStatus(401);
-                        response.setContentType("application/json");
-                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                    } else {
-                        response.sendRedirect("/login");
-                    }
-                })
-            );
-        
-        return http.build();
+                .authenticationEntryPoint(entryPoint())
+            )
+            .build();
+    }
+    
+    private AuthenticationSuccessHandler successHandler() {
+        return (request, response, authentication) -> {
+            response.setStatus(200);
+            response.setContentType("application/json");
+            objectMapper.writeValue(response.getWriter(), 
+                Map.of("success", true, "message", "Login successful"));
+        };
+    }
+    
+    private AuthenticationFailureHandler failureHandler() {
+        return (request, response, exception) -> {
+            response.setStatus(401);
+            response.setContentType("application/json");
+            objectMapper.writeValue(response.getWriter(), 
+                Map.of("success", false, "message", "Invalid credentials"));
+        };
+    }
+    
+    private LogoutSuccessHandler logoutHandler() {
+        return (request, response, authentication) -> {
+            response.setStatus(200);
+            response.setContentType("application/json");
+            objectMapper.writeValue(response.getWriter(), 
+                Map.of("success", true, "message", "Logout successful"));
+        };
+    }
+    
+    private AuthenticationEntryPoint entryPoint() {
+        return (request, response, authException) -> {
+            if (request.getRequestURI().startsWith("/api/")) {
+                response.setStatus(401);
+                response.setContentType("application/json");
+                objectMapper.writeValue(response.getWriter(), 
+                    Map.of("error", "Unauthorized"));
+            } else {
+                response.sendRedirect("/login");
+            }
+        };
     }
     
     @Bean
