@@ -3,7 +3,6 @@ package ru.otus.hw.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -101,10 +100,8 @@ class CommentRestControllerTest {
     @ParameterizedTest
     @MethodSource("getDbCommentDtos")
     @WithMockUser
-    @SuppressWarnings("null")
     void shouldDeleteComment(CommentDto expectedResult) throws Exception {
-        mockMvc.perform(delete("/api/v1/comment/{commentId}", expectedResult.id())
-            .with(csrf()))
+        mockMvc.perform(delete("/api/v1/comment/{commentId}", expectedResult.id()))
             .andExpect(status().isNoContent());
         
         verify(commentService).deleteById(expectedResult.id());
@@ -113,8 +110,7 @@ class CommentRestControllerTest {
     @Test
     @SuppressWarnings("null")
     void shouldNotDeleteCommentForAnon() throws Exception {
-        mockMvc.perform(delete("/api/v1/comment/{commentId}", 1L)
-            .with(csrf()))
+        mockMvc.perform(delete("/api/v1/comment/{commentId}", 1L))
             .andExpect(status().isUnauthorized())
             .andExpect(content().json(objectMapper.writeValueAsString(getUnauthorizedResponseData())));
     }
@@ -127,7 +123,6 @@ class CommentRestControllerTest {
         when(commentService.insert(requestDto)).thenReturn(expectedComment);
 
         mockMvc.perform(post("/api/v1/comment")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
@@ -140,7 +135,6 @@ class CommentRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotCreateCommentForAnon() throws Exception {
         mockMvc.perform(post("/api/v1/comment")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new CreateCommentDto("New Comment", 1L)
@@ -157,7 +151,6 @@ class CommentRestControllerTest {
         when(commentService.update(any(UpdateCommentDto.class))).thenReturn(expectedComment);
         
         mockMvc.perform(put("/api/v1/comment/{commentId}", commentId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
@@ -170,7 +163,6 @@ class CommentRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotUpdateCommentForAnon() throws Exception {
         mockMvc.perform(put("/api/v1/comment/{commentId}", 1L)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new UpdateCommentRequestDto("Updated Comment")
@@ -210,7 +202,6 @@ class CommentRestControllerTest {
         CreateCommentDto invalidRequest = new CreateCommentDto("", 1L);
         
         mockMvc.perform(post("/api/v1/comment")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());
@@ -223,7 +214,6 @@ class CommentRestControllerTest {
         CreateCommentDto invalidRequest = new CreateCommentDto("Valid text", null);
         
         mockMvc.perform(post("/api/v1/comment")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());
@@ -237,7 +227,6 @@ class CommentRestControllerTest {
         Long commentId = 1L;
         
         mockMvc.perform(put("/api/v1/comment/{commentId}", commentId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());

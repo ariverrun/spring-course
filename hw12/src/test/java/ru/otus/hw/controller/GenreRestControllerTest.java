@@ -2,7 +2,6 @@ package ru.otus.hw.controller;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -97,10 +96,8 @@ class GenreRestControllerTest {
     @ParameterizedTest
     @MethodSource("getDbGenreDtos")
     @WithMockUser
-    @SuppressWarnings("null")
     void shouldDeleteGenre(GenreDto expectedResult) throws Exception {
-        mockMvc.perform(delete("/api/v1/genre/{genreId}", expectedResult.id())
-            .with(csrf()))
+        mockMvc.perform(delete("/api/v1/genre/{genreId}", expectedResult.id()))
             .andExpect(status().isNoContent());
         
         verify(genreService).deleteById(expectedResult.id());
@@ -109,8 +106,7 @@ class GenreRestControllerTest {
     @Test
     @SuppressWarnings("null")
     void shouldNotDeleteGenreForAnon() throws Exception {
-        mockMvc.perform(delete("/api/v1/genre/{genreId}", 1L)
-            .with(csrf()))
+        mockMvc.perform(delete("/api/v1/genre/{genreId}", 1L))
             .andExpect(status().isUnauthorized())
             .andExpect(content().json(objectMapper.writeValueAsString(getUnauthorizedResponseData())));        
     }
@@ -123,7 +119,6 @@ class GenreRestControllerTest {
         when(genreService.insert(requestDto)).thenReturn(expectedGenre);
 
         mockMvc.perform(post("/api/v1/genre")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
@@ -138,7 +133,6 @@ class GenreRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotCreateGenreForAnon() throws Exception {
         mockMvc.perform(post("/api/v1/genre")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new CreateGenreRequestDto("New Genre 1")
@@ -155,7 +149,6 @@ class GenreRestControllerTest {
         when(genreService.update(genreId, requestDto)).thenReturn(expectedGenre);
         
         mockMvc.perform(put("/api/v1/genre/{genreId}", genreId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
@@ -168,7 +161,6 @@ class GenreRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotUpdateGenreForAnon() throws Exception {        
         mockMvc.perform(put("/api/v1/genre/{genreId}", 1L)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new UpdateGenreRequestDto("Updated Genre 1")
@@ -208,7 +200,6 @@ class GenreRestControllerTest {
         CreateGenreRequestDto invalidRequest = new CreateGenreRequestDto("");
         
         mockMvc.perform(post("/api/v1/genre")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());
@@ -222,7 +213,6 @@ class GenreRestControllerTest {
         Long genreId = 1L;
         
         mockMvc.perform(put("/api/v1/genre/{genreId}", genreId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());

@@ -2,7 +2,6 @@ package ru.otus.hw.controller;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -99,11 +98,9 @@ class BookRestControllerTest {
  
     @ParameterizedTest
     @MethodSource("getDbBookDtos")
-    @SuppressWarnings("null")
     @WithMockUser
     void shouldDeleteBook(BookDto expectedResult) throws Exception {
-        mockMvc.perform(delete("/api/v1/book/{bookId}", expectedResult.id())
-            .with(csrf()))
+        mockMvc.perform(delete("/api/v1/book/{bookId}", expectedResult.id()))
             .andExpect(status().isNoContent());
         
         verify(bookService).deleteById(expectedResult.id());
@@ -112,8 +109,7 @@ class BookRestControllerTest {
     @Test
     @SuppressWarnings("null")
     void shouldNotDeleteBookForAnon() throws Exception {
-        mockMvc.perform(delete("/api/v1/book/{bookId}", 1L)
-            .with(csrf()))
+        mockMvc.perform(delete("/api/v1/book/{bookId}", 1L))
             .andExpect(status().isUnauthorized())
             .andExpect(content().json(objectMapper.writeValueAsString(getUnauthorizedResponseData())));        
     }
@@ -126,7 +122,6 @@ class BookRestControllerTest {
         when(bookService.insert(requestDto)).thenReturn(expectedBook);
 
         mockMvc.perform(post("/api/v1/book")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
@@ -141,7 +136,6 @@ class BookRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotCreateBookForAnon() throws Exception {
         mockMvc.perform(post("/api/v1/book")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new CreateBookRequestDto("New Book 1", 1L, Set.of(1L, 2L))
@@ -158,7 +152,6 @@ class BookRestControllerTest {
         when(bookService.update(bookId, requestDto)).thenReturn(expectedBook);
         
         mockMvc.perform(put("/api/v1/book/{bookId}", bookId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
@@ -171,7 +164,6 @@ class BookRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotUpdateBookForAnon() throws Exception {        
         mockMvc.perform(put("/api/v1/book/{bookId}", 1L)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new UpdateBookRequestDto("Updated Book 1", 2L, Set.of(1L, 2L, 3L))

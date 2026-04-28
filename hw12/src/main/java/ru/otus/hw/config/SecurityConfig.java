@@ -63,8 +63,7 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
             response.setStatus(200);
             response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), 
-                Map.of("success", true, "message", "Login successful"));
+            objectMapper.writeValue(response.getWriter(), createLoginSuccessResponse());
         };
     }
     
@@ -72,8 +71,7 @@ public class SecurityConfig {
         return (request, response, exception) -> {
             response.setStatus(401);
             response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), 
-                Map.of("success", false, "message", "Invalid credentials"));
+            objectMapper.writeValue(response.getWriter(), createLoginFailureResponse());
         };
     }
     
@@ -81,8 +79,7 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
             response.setStatus(200);
             response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), 
-                Map.of("success", true, "message", "Logout successful"));
+            objectMapper.writeValue(response.getWriter(), createLogoutSuccessResponse());
         };
     }
     
@@ -91,8 +88,7 @@ public class SecurityConfig {
             if (request.getRequestURI().startsWith("/api/")) {
                 response.setStatus(401);
                 response.setContentType("application/json");
-                objectMapper.writeValue(response.getWriter(), 
-                    Map.of("error", "Unauthorized"));
+                objectMapper.writeValue(response.getWriter(), createUnauthorizedResponse());
             } else {
                 response.sendRedirect("/login");
             }
@@ -102,5 +98,30 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    private Map<String, Object> createLoginSuccessResponse() {
+        return Map.of(
+            "success", true,
+            "message", "Login successful"
+        );
+    }
+    
+    private Map<String, Object> createLoginFailureResponse() {
+        return Map.of(
+            "success", false,
+            "message", "Invalid credentials"
+        );
+    }
+    
+    private Map<String, Object> createLogoutSuccessResponse() {
+        return Map.of(
+            "success", true,
+            "message", "Logout successful"
+        );
+    }
+    
+    private Map<String, String> createUnauthorizedResponse() {
+        return Map.of("error", "Unauthorized");
     }
 }

@@ -2,7 +2,6 @@ package ru.otus.hw.controller;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -96,12 +95,10 @@ class AuthorRestControllerTest {
 
     @ParameterizedTest
     @MethodSource("getDbAuthorDtos")
-    @SuppressWarnings("null")
     @WithMockUser
     void shouldDeleteAuthor(AuthorDto expectedResult) throws Exception {
         mockMvc.perform(
-            delete("/api/v1/author/{authorId}", expectedResult.id())
-            .with(csrf()))
+            delete("/api/v1/author/{authorId}", expectedResult.id()))
             .andExpect(status().isNoContent());
         
         verify(authorService).deleteById(expectedResult.id());
@@ -111,8 +108,7 @@ class AuthorRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotDeleteAuthorForAnon() throws Exception {
         mockMvc.perform(
-            delete("/api/v1/author/{authorId}", 1L)
-            .with(csrf()))
+            delete("/api/v1/author/{authorId}", 1L))
             .andExpect(content().json(objectMapper.writeValueAsString(getUnauthorizedResponseData())));        
     }
 
@@ -124,7 +120,6 @@ class AuthorRestControllerTest {
         when(authorService.insert(requestDto)).thenReturn(expectedAuthor);
 
         mockMvc.perform(post("/api/v1/author")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
@@ -139,7 +134,6 @@ class AuthorRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotCreateAuthorForAnon() throws Exception {
         mockMvc.perform(post("/api/v1/author")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new CreateAuthorRequestDto("New Author 1")
@@ -158,7 +152,6 @@ class AuthorRestControllerTest {
         when(authorService.update(authorId, requestDto)).thenReturn(expectedAuthor);
         
         mockMvc.perform(put("/api/v1/author/{authorId}", authorId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
@@ -171,7 +164,6 @@ class AuthorRestControllerTest {
     @SuppressWarnings("null")
     void shouldNotUpdateAuthorForAnon() throws Exception {        
         mockMvc.perform(put("/api/v1/author/{authorId}", 1L)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
                 new UpdateAuthorRequestDto("Author 1.1")
@@ -213,7 +205,6 @@ class AuthorRestControllerTest {
         CreateAuthorRequestDto invalidRequest = new CreateAuthorRequestDto("");
         
         mockMvc.perform(post("/api/v1/author")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());
@@ -227,7 +218,6 @@ class AuthorRestControllerTest {
         Long authorId = 1L;
         
         mockMvc.perform(put("/api/v1/author/{authorId}", authorId)
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());
