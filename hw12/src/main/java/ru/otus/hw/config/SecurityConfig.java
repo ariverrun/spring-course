@@ -1,7 +1,5 @@
 package ru.otus.hw.config;
 
-import java.util.Map;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +15,8 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.dto.RestApiErrorDto;
+import ru.otus.hw.dto.SuccessfulLoginResponseDto;
 
 @Configuration
 @EnableWebSecurity
@@ -63,7 +63,7 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
             response.setStatus(200);
             response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), createLoginSuccessResponse());
+            objectMapper.writeValue(response.getWriter(), new SuccessfulLoginResponseDto(true, "Login successful"));
         };
     }
     
@@ -71,7 +71,7 @@ public class SecurityConfig {
         return (request, response, exception) -> {
             response.setStatus(401);
             response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), createLoginFailureResponse());
+            objectMapper.writeValue(response.getWriter(), new RestApiErrorDto("Unauthorized", "Invalid credentials"));
         };
     }
     
@@ -79,7 +79,7 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
             response.setStatus(200);
             response.setContentType("application/json");
-            objectMapper.writeValue(response.getWriter(), createLogoutSuccessResponse());
+            objectMapper.writeValue(response.getWriter(), new SuccessfulLoginResponseDto(true, "Logout successful"));
         };
     }
     
@@ -88,7 +88,10 @@ public class SecurityConfig {
             if (request.getRequestURI().startsWith("/api/")) {
                 response.setStatus(401);
                 response.setContentType("application/json");
-                objectMapper.writeValue(response.getWriter(), createUnauthorizedResponse());
+                objectMapper.writeValue(
+                    response.getWriter(), 
+                    new RestApiErrorDto("Unauthorized", "Authentication required")
+                );
             } else {
                 response.sendRedirect("/login");
             }
@@ -98,30 +101,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    private Map<String, Object> createLoginSuccessResponse() {
-        return Map.of(
-            "success", true,
-            "message", "Login successful"
-        );
-    }
-    
-    private Map<String, Object> createLoginFailureResponse() {
-        return Map.of(
-            "success", false,
-            "message", "Invalid credentials"
-        );
-    }
-    
-    private Map<String, Object> createLogoutSuccessResponse() {
-        return Map.of(
-            "success", true,
-            "message", "Logout successful"
-        );
-    }
-    
-    private Map<String, String> createUnauthorizedResponse() {
-        return Map.of("error", "Unauthorized");
     }
 }
