@@ -19,6 +19,7 @@ import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.dto.UpdateCommentRequestDto;
+import ru.otus.hw.mapper.CommentMapper;
 import ru.otus.hw.services.CommentService;
 
 @RestController
@@ -26,10 +27,14 @@ import ru.otus.hw.services.CommentService;
 public class CommentRestController {
 
     private final CommentService commentService;
+
+    private final CommentMapper commentMapper;
     
     @GetMapping("/api/v1/comment")
     public List<CommentDto> getCommentsByBookId(@RequestParam Long bookId) {
-        return commentService.findByBookId(bookId);
+        return commentService.findByBookId(bookId).stream()
+            .map(c -> commentMapper.mapCommentToDto(c))
+            .toList();
     }
 
     @GetMapping("/api/v1/comment/{commentId}")

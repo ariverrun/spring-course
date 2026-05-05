@@ -33,11 +33,14 @@ import ru.otus.hw.dto.CreateCommentDto;
 import ru.otus.hw.dto.UpdateCommentDto;
 import ru.otus.hw.dto.UpdateCommentRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.CommentMapper;
+import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
 import ru.otus.hw.security.SecurityConfig;
 import ru.otus.hw.services.CommentService;
 
 @WebMvcTest(CommentRestController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, CommentMapper.class})
 class CommentRestControllerTest {
 
     @Autowired
@@ -54,14 +57,14 @@ class CommentRestControllerTest {
     @WithMockUser
     void shouldGetCommentsByBookId() throws Exception {
         Long bookId = 1L;
-        var expectedResult = getDbCommentDtosByBookId(bookId);
+        var expectedResult = getDbCommentsByBookId(bookId);
         
         when(commentService.findByBookId(bookId)).thenReturn(expectedResult);
         
         mockMvc.perform(get("/api/v1/comment")
             .param("bookId", String.valueOf(bookId)))
             .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
+            .andExpect(content().json(objectMapper.writeValueAsString(getDbCommentDtosByBookId(bookId))));
         
         verify(commentService).findByBookId(bookId);
     }
@@ -258,6 +261,26 @@ class CommentRestControllerTest {
             );
             case 3 -> List.of(
                 new CommentDto(4L, "Comment_4", 3L, "BookTitle_3")
+            );
+            default -> List.of();
+        };
+    }
+
+    private static List<Comment> getDbCommentsByBookId(Long bookId) {
+        Book book1 = new Book(1L, "BookTitle_1", null, null);
+        Book book2 = new Book(2L, "BookTitle_2", null, null);
+        Book book3 = new Book(3L, "BookTitle_3", null, null);
+        
+        return switch (bookId.intValue()) {
+            case 1 -> List.of(
+                new Comment(1L, book1, "Comment_1"),
+                new Comment(2L, book1, "Comment_2")
+            );
+            case 2 -> List.of(
+                new Comment(3L, book2, "Comment_3")
+            );
+            case 3 -> List.of(
+                new Comment(4L, book3, "Comment_4")
             );
             default -> List.of();
         };

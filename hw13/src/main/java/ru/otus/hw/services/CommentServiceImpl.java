@@ -2,6 +2,9 @@ package ru.otus.hw.services;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +28,24 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper commentMapper;
     
+    private final AclServiceWrapperService aclServiceWrapperService;
+
     @Override
     @Transactional
     public CommentDto insert(CreateCommentDto dto) {
         var comment = new Comment(0, getBookById(dto.bookId()), dto.text());
-        return commentMapper.mapCommentToDto(commentRepository.save(comment));
+        comment = commentRepository.save(comment);
+        
+        aclServiceWrapperService.createPermission(comment, BasePermission.READ);
+        aclServiceWrapperService.createPermission(comment, BasePermission.WRITE);
+        aclServiceWrapperService.createPermission(comment, BasePermission.DELETE);
+
+        return commentMapper.mapCommentToDto(comment);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Comment', 'WRITE') or hasRole('ADMIN')")
     public CommentDto update(UpdateCommentDto dto) {
         var comment = commentRepository.findById(dto.id())
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(dto.id())));
@@ -43,14 +55,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CommentDto> findByBookId(Long bookId) {
-        return commentRepository.findByBookId(bookId).stream()
-            .map(c -> commentMapper.mapCommentToDto(c))
-            .toList();
+    @PostFilter("hasPermission(filterObject, 'READ')")
+    public List<Comment> findByBookId(Long bookId) {
+        return commentRepository.findByBookId(bookId);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Comment', 'READ')")
     public CommentDto findById(long id) {
         var comment = commentRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));
@@ -59,8 +71,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Comment', 'DELETE') or hasRole('ADMIN')")
     public void deleteById(long id) {
+        var comment = commentRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));
         commentRepository.deleteById(id);
+        aclServiceWrapperService.deleteAcl(comment);
     }
 
     private Book getBookById(Long bookId) {
