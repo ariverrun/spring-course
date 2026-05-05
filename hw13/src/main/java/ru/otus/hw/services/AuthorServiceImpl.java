@@ -2,6 +2,7 @@ package ru.otus.hw.services;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,9 @@ public class AuthorServiceImpl implements AuthorService {
     private final AclServiceWrapperService aclServiceWrapperService;
 
     @Override
-    public List<AuthorDto> findAll() {
-        return authorRepository.findAll().stream()
-            .map(a -> authorMapper.mapAuthorToDto(a))
-            .toList();
+    @PostFilter("hasPermission(filterObject, 'READ')")
+    public List<Author> findAll() {
+        return authorRepository.findAll();
     }
 
     @Override

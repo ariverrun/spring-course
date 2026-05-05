@@ -32,11 +32,13 @@ import ru.otus.hw.dto.CreateAuthorRequestDto;
 import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.UpdateAuthorRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.AuthorMapper;
+import ru.otus.hw.models.Author;
 import ru.otus.hw.security.SecurityConfig;
 import ru.otus.hw.services.AuthorService;
 
-@WebMvcTest(AuthorRestController.class)
-@Import(SecurityConfig.class)
+@WebMvcTest(value = AuthorRestController.class)
+@Import({SecurityConfig.class, AuthorMapper.class})
 class AuthorRestControllerTest {
 
     @Autowired
@@ -52,7 +54,7 @@ class AuthorRestControllerTest {
     @SuppressWarnings("null")
     @WithMockUser
     void shouldListAllAuthors() throws Exception {
-        var expectedResult = getDbAuthorDtos();
+        var expectedResult = getDbAuthors();
         
         when(authorService.findAll()).thenReturn(expectedResult);
         
@@ -221,6 +223,14 @@ class AuthorRestControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest());
+    }
+
+    private static List<Author> getDbAuthors() {
+        return List.of(
+            new Author(1L, "Author_1"),
+            new Author(2L, "Author_2"),
+            new Author(3L, "Author_3")
+        );
     }
 
     private static List<AuthorDto> getDbAuthorDtos() {

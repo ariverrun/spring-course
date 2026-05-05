@@ -5,9 +5,10 @@ import java.util.List;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.CreateAuthorRequestDto;
 import ru.otus.hw.dto.UpdateAuthorRequestDto;
+import ru.otus.hw.models.Author;
 
 public interface AuthorService {
-    List<AuthorDto> findAll();
+    List<Author> findAll();
 
     AuthorDto findById(long id);
 
