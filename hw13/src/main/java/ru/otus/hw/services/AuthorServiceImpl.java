@@ -43,10 +43,14 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     public AuthorDto insert(CreateAuthorRequestDto dto) {
-        var author = new Author(Long.valueOf(0), dto.fullName());
-        aclServiceWrapperService.createPermission(author, BasePermission.READ);
-        aclServiceWrapperService.createPermission(author, BasePermission.WRITE);
-        return authorMapper.mapAuthorToDto(authorRepository.save(author));
+        var author = new Author(null, dto.fullName());
+        var savedAuthor = authorRepository.save(author);
+        
+        aclServiceWrapperService.createPermission(savedAuthor, BasePermission.READ);
+        aclServiceWrapperService.createPermission(savedAuthor, BasePermission.WRITE);
+        aclServiceWrapperService.createPermission(savedAuthor, BasePermission.DELETE);
+
+        return authorMapper.mapAuthorToDto(savedAuthor);
     }
 
     @Override
