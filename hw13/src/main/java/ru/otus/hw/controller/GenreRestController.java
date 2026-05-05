@@ -18,6 +18,7 @@ import ru.otus.hw.dto.CreateGenreRequestDto;
 import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateGenreRequestDto;
+import ru.otus.hw.mapper.GenreMapper;
 import ru.otus.hw.services.GenreService;
 
 @RestController
@@ -25,10 +26,14 @@ import ru.otus.hw.services.GenreService;
 public class GenreRestController {
 
     private final GenreService genreService;
+
+    private final GenreMapper genreMapper;
     
     @GetMapping("/api/v1/genre")
     public List<GenreDto> listAllGenres() {
-        return genreService.findAll();
+        return genreService.findAll().stream()
+            .map(g -> genreMapper.mapGenreToDto(g))
+            .toList();
     }
 
     @GetMapping("/api/v1/genre/{genreId}")

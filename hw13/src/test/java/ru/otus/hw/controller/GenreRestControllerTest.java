@@ -32,11 +32,13 @@ import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateGenreRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.GenreMapper;
+import ru.otus.hw.models.Genre;
 import ru.otus.hw.security.SecurityConfig;
 import ru.otus.hw.services.GenreService;
 
 @WebMvcTest(GenreRestController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, GenreMapper.class})
 class GenreRestControllerTest {
 
     @Autowired
@@ -52,7 +54,7 @@ class GenreRestControllerTest {
     @SuppressWarnings("null")
     @WithMockUser
     void shouldListAllGenres() throws Exception {
-        var expectedResult = getDbGenreDtos();
+        var expectedResult = getDbGenres();
         
         when(genreService.findAll()).thenReturn(expectedResult);
         
@@ -226,6 +228,17 @@ class GenreRestControllerTest {
             new GenreDto(4L, "Genre_4"),
             new GenreDto(5L, "Genre_5"),
             new GenreDto(6L, "Genre_6")
+        );
+    }
+
+    private static List<Genre> getDbGenres() {
+        return List.of(
+            new Genre(1L, "Genre_1"),
+            new Genre(2L, "Genre_2"),
+            new Genre(3L, "Genre_3"),
+            new Genre(4L, "Genre_4"),
+            new Genre(5L, "Genre_5"),
+            new Genre(6L, "Genre_6")
         );
     }
 
