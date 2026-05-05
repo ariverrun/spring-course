@@ -29,9 +29,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 @Configuration
 public class AclConfig {
-    private final long ACL_ENTRY_LIFE_TIME_MINUTES = 30;
+    private static final long ACL_ENTRY_LIFE_TIME_MINUTES = 30;
 
-    private final long ACL_CACHE_MAX_SIZE = 1000;
+    private static final long ACL_CACHE_MAX_SIZE = 1000;
 
     @Bean
     @SuppressWarnings("null")
