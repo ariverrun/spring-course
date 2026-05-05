@@ -45,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Comment', 'WRITE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#dto.id, 'ru.otus.hw.models.Comment', 'WRITE') or hasRole('ADMIN')")
     public CommentDto update(UpdateCommentDto dto) {
         var comment = commentRepository.findById(dto.id())
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(dto.id())));
