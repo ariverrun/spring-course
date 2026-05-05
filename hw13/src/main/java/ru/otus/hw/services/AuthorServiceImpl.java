@@ -44,13 +44,13 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     public AuthorDto insert(CreateAuthorRequestDto dto) {
         var author = new Author(null, dto.fullName());
-        var savedAuthor = authorRepository.save(author);
+        author = authorRepository.save(author);
         
-        aclServiceWrapperService.createPermission(savedAuthor, BasePermission.READ);
-        aclServiceWrapperService.createPermission(savedAuthor, BasePermission.WRITE);
-        aclServiceWrapperService.createPermission(savedAuthor, BasePermission.DELETE);
+        aclServiceWrapperService.createPermission(author, BasePermission.READ);
+        aclServiceWrapperService.createPermission(author, BasePermission.WRITE);
+        aclServiceWrapperService.createPermission(author, BasePermission.DELETE);
 
-        return authorMapper.mapAuthorToDto(savedAuthor);
+        return authorMapper.mapAuthorToDto(author);
     }
 
     @Override
@@ -67,6 +67,9 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Author', 'DELETE') or hasRole('ADMIN')")
     public void deleteById(long id) {
+        var author = authorRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
         authorRepository.deleteById(id);
+        aclServiceWrapperService.deleteAcl(author);
     }
 }

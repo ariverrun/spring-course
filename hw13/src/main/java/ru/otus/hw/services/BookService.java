@@ -5,11 +5,12 @@ import java.util.List;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
+import ru.otus.hw.models.Book;
 
 public interface BookService {
     BookDto findById(long id);
 
-    List<BookDto> findAll();
+    List<Book> findAll();
 
     BookDto insert(CreateBookRequestDto dto);
 

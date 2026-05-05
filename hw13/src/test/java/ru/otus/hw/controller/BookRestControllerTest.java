@@ -35,11 +35,15 @@ import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mapper.BookMapper;
+import ru.otus.hw.models.Author;
+import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Genre;
 import ru.otus.hw.security.SecurityConfig;
 import ru.otus.hw.services.BookService;
 
 @WebMvcTest(BookRestController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, BookMapper.class})
 class BookRestControllerTest {
 
     @Autowired
@@ -55,7 +59,7 @@ class BookRestControllerTest {
     @SuppressWarnings("null")
     @WithMockUser
     void shouldListAllBooks() throws Exception {
-        var expectedResult = getDbBookDtos();
+        var expectedResult = getDbBooks();
         
         when(bookService.findAll()).thenReturn(expectedResult);
         
@@ -265,6 +269,25 @@ class BookRestControllerTest {
                 ))
             )
         );
+    }
+
+    private static List<Book> getDbBooks() {
+        Author author1 = new Author(1L, "Author_1");
+        Author author2 = new Author(2L, "Author_2");
+        Author author3 = new Author(3L, "Author_3");
+        
+        Genre genre1 = new Genre(1L, "Genre_1");
+        Genre genre2 = new Genre(2L, "Genre_2");
+        Genre genre3 = new Genre(3L, "Genre_3");
+        Genre genre4 = new Genre(4L, "Genre_4");
+        Genre genre5 = new Genre(5L, "Genre_5");
+        Genre genre6 = new Genre(6L, "Genre_6");
+        
+        Book book1 = new Book(1L, "BookTitle_1", author1, List.of(genre1, genre2));
+        Book book2 = new Book(2L, "BookTitle_2", author2, List.of(genre3, genre4));
+        Book book3 = new Book(3L, "BookTitle_3", author3, List.of(genre5, genre6));
+        
+        return List.of(book1, book2, book3);
     }
 
     private static Map<String,String> getUnauthorizedResponseData() {
