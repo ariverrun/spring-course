@@ -97,7 +97,7 @@ class GenreRestControllerTest {
 
     @ParameterizedTest
     @MethodSource("getDbGenreDtos")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldDeleteGenre(GenreDto expectedResult) throws Exception {
         mockMvc.perform(delete("/api/v1/genre/{genreId}", expectedResult.id()))
             .andExpect(status().isNoContent());
@@ -116,7 +116,7 @@ class GenreRestControllerTest {
     @ParameterizedTest
     @MethodSource("getCreateGenreTestData")
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldCreateGenre(CreateGenreRequestDto requestDto, GenreDto expectedGenre) throws Exception {
         when(genreService.insert(requestDto)).thenReturn(expectedGenre);
 
@@ -146,7 +146,7 @@ class GenreRestControllerTest {
     @ParameterizedTest
     @MethodSource("getUpdateGenreTestData")
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldUpdateGenre(UpdateGenreRequestDto requestDto, Long genreId, GenreDto expectedGenre) throws Exception {
         when(genreService.update(genreId, requestDto)).thenReturn(expectedGenre);
         
@@ -197,7 +197,7 @@ class GenreRestControllerTest {
 
     @Test
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldReturn400WhenInvalidInput() throws Exception {
         CreateGenreRequestDto invalidRequest = new CreateGenreRequestDto("");
         
@@ -209,7 +209,7 @@ class GenreRestControllerTest {
 
     @Test
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldReturn400WhenUpdateWithInvalidInput() throws Exception {
         UpdateGenreRequestDto invalidRequest = new UpdateGenreRequestDto("");
         Long genreId = 1L;

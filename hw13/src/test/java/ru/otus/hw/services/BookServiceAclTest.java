@@ -77,10 +77,10 @@ class BookServiceAclTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void updateSucceedsForAdminRoleViaRoleBypass() {
+    void updateThrowsForAdminWithoutAclPermission() {
         var dto = new UpdateBookRequestDto("Title_1.3", 1L, Set.of(1L, 2L));
-        var result = bookService.update(1L, dto);
-        assertThat(result.title()).isEqualTo("Title_1.3");
+        assertThatThrownBy(() -> bookService.update(1L, dto))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -98,7 +98,8 @@ class BookServiceAclTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void deleteSucceedsForAdminRoleViaRoleBypass() {
-        bookService.deleteById(3L);
+    void deleteThrowsForAdminWithoutAclPermission() {
+        assertThatThrownBy(() -> bookService.deleteById(3L))
+            .isInstanceOf(AccessDeniedException.class);
     }
 }

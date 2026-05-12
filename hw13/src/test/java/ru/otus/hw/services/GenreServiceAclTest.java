@@ -75,10 +75,10 @@ class GenreServiceAclTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void updateSucceedsForAdminRoleViaRoleBypass() {
+    void updateThrowsForAdminWithoutAclPermission() {
         var dto = new UpdateGenreRequestDto("Genre_1.3");
-        var result = genreService.update(1L, dto);
-        assertThat(result.name()).isEqualTo("Genre_1.3");
+        assertThatThrownBy(() -> genreService.update(1L, dto))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -96,7 +96,8 @@ class GenreServiceAclTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void deleteSucceedsForAdminRoleViaRoleBypass() {
-        genreService.deleteById(6L);
+    void deleteThrowsForAdminWithoutAclPermission() {
+        assertThatThrownBy(() -> genreService.deleteById(6L))
+            .isInstanceOf(AccessDeniedException.class);
     }
 }

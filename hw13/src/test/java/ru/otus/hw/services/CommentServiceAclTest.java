@@ -75,10 +75,10 @@ class CommentServiceAclTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void updateSucceedsForAdminRoleViaRoleBypass() {
+    void updateThrowsForAdminWithoutAclPermission() {
         var dto = new UpdateCommentDto(1L, "Text_1.3");
-        var result = commentService.update(dto);
-        assertThat(result.text()).isEqualTo("Text_1.3");
+        assertThatThrownBy(() -> commentService.update(dto))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -96,7 +96,8 @@ class CommentServiceAclTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void deleteSucceedsForAdminRoleViaRoleBypass() {
-        commentService.deleteById(4L);
+    void deleteThrowsForAdminWithoutAclPermission() {
+        assertThatThrownBy(() -> commentService.deleteById(4L))
+            .isInstanceOf(AccessDeniedException.class);
     }
 }

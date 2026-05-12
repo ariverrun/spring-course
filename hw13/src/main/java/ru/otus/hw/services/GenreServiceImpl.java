@@ -55,7 +55,7 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Genre', 'WRITE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Genre', 'WRITE')")
     public GenreDto update(long id, UpdateGenreRequestDto dto) {
         var genre = genreRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));
@@ -65,7 +65,7 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Genre', 'DELETE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Genre', 'DELETE')")
     public void deleteById(long id) {
         var genre = genreRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));

@@ -74,7 +74,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Book', 'WRITE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Book', 'WRITE')")
     public BookDto update(long id, UpdateBookRequestDto dto) {
         var book = bookRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
@@ -86,7 +86,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Book', 'DELETE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Book', 'DELETE')")
     public void deleteById(long id) {
         var book = bookRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));

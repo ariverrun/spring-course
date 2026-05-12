@@ -55,7 +55,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Author', 'WRITE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Author', 'WRITE')")
     public AuthorDto update(long id, UpdateAuthorRequestDto dto) {
         var author = authorRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
@@ -65,7 +65,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Author', 'DELETE') or hasRole('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Author', 'DELETE')")
     public void deleteById(long id) {
         var author = authorRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));

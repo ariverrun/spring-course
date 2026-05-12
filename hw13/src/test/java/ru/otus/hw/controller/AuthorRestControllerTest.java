@@ -97,7 +97,7 @@ class AuthorRestControllerTest {
 
     @ParameterizedTest
     @MethodSource("getDbAuthorDtos")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldDeleteAuthor(AuthorDto expectedResult) throws Exception {
         mockMvc.perform(
             delete("/api/v1/author/{authorId}", expectedResult.id()))
@@ -117,7 +117,7 @@ class AuthorRestControllerTest {
     @ParameterizedTest
     @MethodSource("getCreateAuthorTestData")
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldCreateAuthor(CreateAuthorRequestDto requestDto, AuthorDto expectedAuthor) throws Exception {
         when(authorService.insert(requestDto)).thenReturn(expectedAuthor);
 
@@ -149,7 +149,7 @@ class AuthorRestControllerTest {
     @ParameterizedTest
     @MethodSource("getUpdateAuthorTestData")
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldUpdateAuthor(UpdateAuthorRequestDto requestDto, Long authorId, AuthorDto expectedAuthor) throws Exception {
         when(authorService.update(authorId, requestDto)).thenReturn(expectedAuthor);
         
@@ -202,7 +202,7 @@ class AuthorRestControllerTest {
 
     @Test
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldReturn400WhenInvalidInput() throws Exception {
         CreateAuthorRequestDto invalidRequest = new CreateAuthorRequestDto("");
         
@@ -214,7 +214,7 @@ class AuthorRestControllerTest {
 
     @Test
     @SuppressWarnings("null")
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void shouldReturn400WhenUpdateWithInvalidInput() throws Exception {
         UpdateAuthorRequestDto invalidRequest = new UpdateAuthorRequestDto("");
         Long authorId = 1L;
