@@ -35,8 +35,8 @@ class BookServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findAllReturnsEmptyListForUserWithoutPermissions() {
-        assertThat(bookService.findAll()).isEmpty();
+    void findAllReturnsAllBooksForAnyUser() {
+        assertThat(bookService.findAll()).hasSize(3);
     }
 
     @Test
@@ -54,9 +54,8 @@ class BookServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findByIdThrowsForUserWithoutReadPermission() {
-        assertThatThrownBy(() -> bookService.findById(1L))
-            .isInstanceOf(AccessDeniedException.class);
+    void findByIdSucceedsForAnyUser() {
+        assertThat(bookService.findById(1L)).isNotNull();
     }
 
     @Test

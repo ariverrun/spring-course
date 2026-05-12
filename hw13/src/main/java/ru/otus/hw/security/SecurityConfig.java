@@ -57,9 +57,7 @@ public class SecurityConfig {
                 .logoutUrl("/api/v1/auth/logout")
                 .logoutSuccessHandler(logoutHandler())
             )
-            .exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint(entryPoint())
-            )
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint()))
             .build();
     }
     

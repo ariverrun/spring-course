@@ -2,7 +2,6 @@ package ru.otus.hw.services;
 
 import java.util.List;
 
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
@@ -55,14 +54,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, 'READ')")
     public List<Comment> findByBookId(Long bookId) {
         return commentRepository.findByBookId(bookId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Comment', 'READ')")
     public CommentDto findById(long id) {
         var comment = commentRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Comment with id %d not found".formatted(id)));

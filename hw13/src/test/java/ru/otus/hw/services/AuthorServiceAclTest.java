@@ -33,8 +33,8 @@ class AuthorServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findAllReturnsEmptyListForUserWithoutPermissions() {
-        assertThat(authorService.findAll()).isEmpty();
+    void findAllReturnsAllAuthorsForAnyUser() {
+        assertThat(authorService.findAll()).hasSize(3);
     }
 
     @Test
@@ -52,9 +52,8 @@ class AuthorServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findByIdThrowsForUserWithoutReadPermission() {
-        assertThatThrownBy(() -> authorService.findById(1L))
-            .isInstanceOf(AccessDeniedException.class);
+    void findByIdSucceedsForAnyUser() {
+        assertThat(authorService.findById(1L)).isNotNull();
     }
 
     @Test

@@ -2,7 +2,6 @@ package ru.otus.hw.services;
 
 import java.util.List;
 
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
@@ -27,13 +26,11 @@ public class GenreServiceImpl implements GenreService {
     private final AclServiceWrapperService aclServiceWrapperService;
 
     @Override
-    @PostFilter("hasPermission(filterObject, 'READ')")
     public List<Genre> findAll() {
         return genreRepository.findAll();
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Genre', 'READ')")
     public GenreDto findById(long id) {
         var genre = genreRepository.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(id)));

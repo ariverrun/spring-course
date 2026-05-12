@@ -5,7 +5,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Book', 'READ')")
     public BookDto findById(long id) {
         var book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id %d is not found".formatted(id)));
@@ -48,7 +46,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    @PostFilter("hasPermission(filterObject, 'READ')")
     public List<Book> findAll() {
         return bookRepository.findAll();
     }

@@ -33,8 +33,8 @@ class GenreServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findAllReturnsEmptyListForUserWithoutPermissions() {
-        assertThat(genreService.findAll()).isEmpty();
+    void findAllReturnsAllGenresForAnyUser() {
+        assertThat(genreService.findAll()).hasSize(6);
     }
 
     @Test
@@ -52,9 +52,8 @@ class GenreServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findByIdThrowsForUserWithoutReadPermission() {
-        assertThatThrownBy(() -> genreService.findById(1L))
-            .isInstanceOf(AccessDeniedException.class);
+    void findByIdSucceedsForAnyUser() {
+        assertThat(genreService.findById(1L)).isNotNull();
     }
 
     @Test

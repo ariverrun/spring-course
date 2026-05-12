@@ -2,7 +2,6 @@ package ru.otus.hw.services;
 
 import java.util.List;
 
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
@@ -27,13 +26,11 @@ public class AuthorServiceImpl implements AuthorService {
     private final AclServiceWrapperService aclServiceWrapperService;
 
     @Override
-    @PostFilter("hasPermission(filterObject, 'READ')")
     public List<Author> findAll() {
         return authorRepository.findAll();
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ru.otus.hw.models.Author', 'READ')")
     public AuthorDto findById(long id) {
         var author = authorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));

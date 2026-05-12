@@ -33,8 +33,8 @@ class CommentServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findByBookIdReturnsEmptyListForUserWithoutPermissions() {
-        assertThat(commentService.findByBookId(1L)).isEmpty();
+    void findByBookIdReturnsAllCommentsForAnyUser() {
+        assertThat(commentService.findByBookId(1L)).hasSize(2);
     }
 
     @Test
@@ -52,9 +52,8 @@ class CommentServiceAclTest {
 
     @Test
     @WithMockUser(username = "user3")
-    void findByIdThrowsForUserWithoutReadPermission() {
-        assertThatThrownBy(() -> commentService.findById(1L))
-            .isInstanceOf(AccessDeniedException.class);
+    void findByIdSucceedsForAnyUser() {
+        assertThat(commentService.findById(1L)).isNotNull();
     }
 
     @Test
