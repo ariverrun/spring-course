@@ -54,8 +54,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Comment> findByBookId(Long bookId) {
-        return commentRepository.findByBookId(bookId);
+    public List<CommentDto> findByBookId(Long bookId) {
+        return commentRepository.findByBookId(bookId).stream().map(commentMapper::mapCommentToDto).toList();
     }
 
     @Override

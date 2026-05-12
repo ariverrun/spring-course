@@ -57,8 +57,8 @@ class CommentRestControllerTest {
     @WithMockUser
     void shouldGetCommentsByBookId() throws Exception {
         Long bookId = 1L;
-        var expectedResult = getDbCommentsByBookId(bookId);
-        
+        var expectedResult = getDbCommentDtosByBookId(bookId);
+
         when(commentService.findByBookId(bookId)).thenReturn(expectedResult);
         
         mockMvc.perform(get("/api/v1/comment")

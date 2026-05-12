@@ -59,8 +59,8 @@ class BookRestControllerTest {
     @SuppressWarnings("null")
     @WithMockUser
     void shouldListAllBooks() throws Exception {
-        var expectedResult = getDbBooks();
-        
+        var expectedResult = getDbBookDtos();
+
         when(bookService.findAll()).thenReturn(expectedResult);
         
         mockMvc.perform(get("/api/v1/book"))

@@ -18,7 +18,6 @@ import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.CreateAuthorRequestDto;
 import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.UpdateAuthorRequestDto;
-import ru.otus.hw.mapper.AuthorMapper;
 import ru.otus.hw.services.AuthorService;
 
 @RestController
@@ -27,13 +26,9 @@ public class AuthorRestController {
 
     private final AuthorService authorService;
 
-    private final AuthorMapper authorMapper;
-    
     @GetMapping("/api/v1/author")
     public List<AuthorDto> listAllAuthors() {
-        return authorService.findAll().stream()
-            .map(a -> authorMapper.mapAuthorToDto(a))
-            .toList();
+        return authorService.findAll();
     }
 
     @GetMapping("/api/v1/author/{authorId}")

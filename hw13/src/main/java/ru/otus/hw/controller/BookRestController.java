@@ -18,7 +18,6 @@ import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
 import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
-import ru.otus.hw.mapper.BookMapper;
 import ru.otus.hw.services.BookService;
 
 @RestController
@@ -27,13 +26,9 @@ public class BookRestController {
 
     private final BookService bookService;
 
-    private final BookMapper bookMapper;
-    
-    @GetMapping({"/api/v1/book"})
+    @GetMapping("/api/v1/book")
     public List<BookDto> listAllBooks() {
-        return bookService.findAll().stream()
-            .map(b -> bookMapper.mapBookToDto(b))
-            .toList();
+        return bookService.findAll();
     }
 
     @GetMapping("/api/v1/book/{bookId}")
@@ -52,7 +47,7 @@ public class BookRestController {
     public CreatedEntityDto createBook(@RequestBody @Valid CreateBookRequestDto requestDto) {
         var book = bookService.insert(requestDto);
         return new CreatedEntityDto(book.id());
-    }    
+    }
 
     @PutMapping("/api/v1/book/{bookId}")
     public BookDto updateBook(@PathVariable Long bookId, @RequestBody @Valid UpdateBookRequestDto requestDto) {

@@ -26,8 +26,8 @@ public class AuthorServiceImpl implements AuthorService {
     private final AclServiceWrapperService aclServiceWrapperService;
 
     @Override
-    public List<Author> findAll() {
-        return authorRepository.findAll();
+    public List<AuthorDto> findAll() {
+        return authorRepository.findAll().stream().map(authorMapper::mapAuthorToDto).toList();
     }
 
     @Override

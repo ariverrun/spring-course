@@ -54,8 +54,8 @@ class AuthorRestControllerTest {
     @SuppressWarnings("null")
     @WithMockUser
     void shouldListAllAuthors() throws Exception {
-        var expectedResult = getDbAuthors();
-        
+        var expectedResult = getDbAuthorDtos();
+
         when(authorService.findAll()).thenReturn(expectedResult);
         
         mockMvc.perform(get("/api/v1/author"))

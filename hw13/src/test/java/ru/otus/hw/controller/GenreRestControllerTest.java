@@ -54,8 +54,8 @@ class GenreRestControllerTest {
     @SuppressWarnings("null")
     @WithMockUser
     void shouldListAllGenres() throws Exception {
-        var expectedResult = getDbGenres();
-        
+        var expectedResult = getDbGenreDtos();
+
         when(genreService.findAll()).thenReturn(expectedResult);
         
         mockMvc.perform(get("/api/v1/genre"))

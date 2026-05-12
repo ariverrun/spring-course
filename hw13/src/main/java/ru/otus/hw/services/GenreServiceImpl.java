@@ -26,8 +26,8 @@ public class GenreServiceImpl implements GenreService {
     private final AclServiceWrapperService aclServiceWrapperService;
 
     @Override
-    public List<Genre> findAll() {
-        return genreRepository.findAll();
+    public List<GenreDto> findAll() {
+        return genreRepository.findAll().stream().map(genreMapper::mapGenreToDto).toList();
     }
 
     @Override
