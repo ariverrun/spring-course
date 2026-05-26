@@ -2,11 +2,10 @@ package ru.otus.hw.batch;
 
 import java.util.List;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
@@ -60,20 +59,6 @@ public class JobConfig {
     private final MigrationIdCache cache;
 
     @Bean
-    public Job migrationJob(JobRepository jobRepository,
-                            Step cleanMongoStep,
-                            Step migrateAuthorsStep, Step migrateGenresStep,
-                            Step migrateBooksStep, Step migrateCommentsStep) {
-        return new JobBuilder("migrationJob", jobRepository)
-                .start(cleanMongoStep)
-                .next(migrateAuthorsStep)
-                .next(migrateGenresStep)
-                .next(migrateBooksStep)
-                .next(migrateCommentsStep)
-                .build();
-    }
-
-    @Bean
     public Step cleanMongoStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
         return new StepBuilder("cleanMongoStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
@@ -81,16 +66,42 @@ public class JobConfig {
                     bookDocumentRepository.deleteAll();
                     genreDocumentRepository.deleteAll();
                     authorDocumentRepository.deleteAll();
+                    cache.clear();
                     return RepeatStatus.FINISHED;
                 }, txManager)
                 .build();
     }
 
     @Bean
-    public Step migrateAuthorsStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
+    @StepScope
+    public ListItemReader<Author> authorItemReader() {
+        return new ListItemReader<>(jpaAuthorRepository.findAll());
+    }
+
+    @Bean
+    @StepScope
+    public ListItemReader<Genre> genreItemReader() {
+        return new ListItemReader<>(jpaGenreRepository.findAll());
+    }
+
+    @Bean
+    @StepScope
+    public ListItemReader<Book> bookItemReader() {
+        return new ListItemReader<>(jpaBookRepository.findAll());
+    }
+
+    @Bean
+    @StepScope
+    public ListItemReader<Comment> commentItemReader() {
+        return new ListItemReader<>(jpaCommentRepository.findAllWithBook());
+    }
+
+    @Bean
+    public Step migrateAuthorsStep(JobRepository jobRepository, PlatformTransactionManager txManager,
+                                   ListItemReader<Author> authorItemReader) {
         return new StepBuilder("migrateAuthorsStep", jobRepository)
                 .<Author, AuthorItem>chunk(10, txManager)
-                .reader(new ListItemReader<>(jpaAuthorRepository.findAll()))
+                .reader(authorItemReader)
                 .processor(author -> new AuthorItem(author.getId(),
                         new AuthorDocument(null, author.getFullName())))
                 .writer(chunk -> {
@@ -103,10 +114,11 @@ public class JobConfig {
     }
 
     @Bean
-    public Step migrateGenresStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
+    public Step migrateGenresStep(JobRepository jobRepository, PlatformTransactionManager txManager,
+                                  ListItemReader<Genre> genreItemReader) {
         return new StepBuilder("migrateGenresStep", jobRepository)
                 .<Genre, GenreItem>chunk(10, txManager)
-                .reader(new ListItemReader<>(jpaGenreRepository.findAll()))
+                .reader(genreItemReader)
                 .processor(genre -> new GenreItem(genre.getId(),
                         new GenreDocument(null, genre.getName())))
                 .writer(chunk -> {
@@ -119,10 +131,11 @@ public class JobConfig {
     }
 
     @Bean
-    public Step migrateBooksStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
+    public Step migrateBooksStep(JobRepository jobRepository, PlatformTransactionManager txManager,
+                                 ListItemReader<Book> bookItemReader) {
         return new StepBuilder("migrateBooksStep", jobRepository)
                 .<Book, BookItem>chunk(10, txManager)
-                .reader(new ListItemReader<>(jpaBookRepository.findAll()))
+                .reader(bookItemReader)
                 .processor(book -> {
                     AuthorDocument authorDocument = authorDocumentRepository
                             .findById(cache.getAuthorId(book.getAuthor().getId()))
@@ -145,10 +158,11 @@ public class JobConfig {
     }
 
     @Bean
-    public Step migrateCommentsStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
+    public Step migrateCommentsStep(JobRepository jobRepository, PlatformTransactionManager txManager,
+                                    ListItemReader<Comment> commentItemReader) {
         return new StepBuilder("migrateCommentsStep", jobRepository)
                 .<Comment, CommentDocument>chunk(10, txManager)
-                .reader(new ListItemReader<>(jpaCommentRepository.findAllWithBook()))
+                .reader(commentItemReader)
                 .processor(comment -> {
                     BookDocument bookDocument = bookDocumentRepository
                             .findById(cache.getBookId(comment.getBook().getId()))

@@ -37,4 +37,10 @@ public class MigrationIdCache {
     public String getBookId(long jpaId) {
         return bookIds.get(jpaId);
     }
+
+    public void clear() {
+        authorIds.clear();
+        genreIds.clear();
+        bookIds.clear();
+    }
 }
