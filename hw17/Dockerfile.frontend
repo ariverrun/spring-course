@@ -1,0 +1,12 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+ARG BACKEND_URL=
+ENV VITE_BACKEND_URL=$BACKEND_URL
+RUN npx vite build --outDir /dist
+
+FROM alpine:3.19
+COPY --from=builder /dist /dist
+CMD ["sh", "-c", "cp -r /dist/. /html/"]
