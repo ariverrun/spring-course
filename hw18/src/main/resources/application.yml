@@ -1,0 +1,71 @@
+server:
+  port: 8040
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:maindb
+
+  jpa:
+    hibernate:
+      ddl-auto: none 
+
+    properties:
+      hibernate:
+        '[format_sql]': true
+
+    show-sql: true
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+resilience4j:
+  retry:
+    retry-aspect-order: 2
+    instances:
+      authorService:
+        maxAttempts: 3
+        waitDuration: 1s
+      bookService:
+        maxAttempts: 3
+        waitDuration: 1s
+      commentService:
+        maxAttempts: 3
+        waitDuration: 1s
+      genreService:
+        maxAttempts: 3
+        waitDuration: 1s
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+    instances:
+      authorService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      bookService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      commentService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+      genreService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+logging:
+  level:
+    '[io.github.resilience4j.retry]': DEBUG
+    '[io.github.resilience4j.circuitbreaker]': DEBUG
